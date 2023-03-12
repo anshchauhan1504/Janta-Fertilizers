@@ -9,6 +9,7 @@ const ProductSchema=new mongoose.Schema(
         img:{type:String, required:true},
         categories:{type:Array},
         price:{type:Number,required:true},
+        instock:{type:Boolean, default:true},
     },
     {timestamps:true} //It will going to create our createdAt time and updated at time
 );

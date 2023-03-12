@@ -68,8 +68,10 @@ const Icon = styled.div`
 
 const ProductItem = ({ item }) => {
   const navigate=useNavigate();
+
   return (
-    <Container key={item.id} onClick={()=>navigate(`/Product/${item.id}`)}>
+    // key={item.id} onClick={()=>navigate(`/Product/${item.id}`)} 
+    <Container >
       <Circle />
 
       <Image src={item.img} />
@@ -79,7 +81,7 @@ const ProductItem = ({ item }) => {
           <ShoppingBasketOutlined />
         </Icon>
         <Icon>
-          <SearchOutlined />
+          <SearchOutlined onClick={()=>navigate(`/Product/${item._id}`)}/>
         </Icon>
         <Icon>
           <FavoriteBorderOutlined />

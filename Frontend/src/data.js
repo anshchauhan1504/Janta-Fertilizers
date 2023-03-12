@@ -16,21 +16,25 @@ export const categories = [
     id: 1,
     img: i1,
     title: "Fungicide",
+    cat:"Fungicide"
   },
   {
     id: 2,
     img: i3,
     title: "Growth",
+    cat:"Growth"
   },
   {
     id: 3,
     img: i4,
     title: "Herbicide",
+    cat:"Herbicide"
   },
   {
     id: 4,
     img: i6,
     title: "Insecticide",
+    cat:"Insecticide"
   },
 ];
 
@@ -38,34 +42,42 @@ export const popularProducts = [
   {
     id: 5,
     img: p1,
+    cat:"Fungicide"
   },
   {
     id: 6,
     img: p2,
+    cat:"Insecticide"
   },
   {
     id: 7,
     img: p3,
+    cat:"Fungicide"
   },
   {
     id: 8,
     img: p4,
+    cat:"Fungicide"
   },
   {
     id: 9,
     img: p5,
+    cat:"Fungicide"
   },
   {
     id: 10,
     img: p6,
+    cat:"Fungicide"
   },
   {
     id: 11,
     img: p7,
+    cat:"Herbicide"
   },
   {
     id: 12,
     img: p8,
+    cat:"Insecticide"
   },
 ];
 

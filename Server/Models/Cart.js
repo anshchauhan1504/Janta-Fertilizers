@@ -20,4 +20,4 @@ const CartSchema=new mongoose.Schema(
     {timestamps:true} //It will going to create our createdAt time and updated at time
 );
 
-module.exports=mongoose.model("User",CartSchema);
+module.exports=mongoose.model("Cart",CartSchema);

@@ -2,6 +2,9 @@ import { Add, Remove } from '@material-ui/icons';
 import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import Enquiry from '../Components/Enquiry';
+import Footer from '../Components/Footer';
+import Navbar from '../Components/Navbar';
 
 import { FungiItems, HerbiItems, InsectItems, popularProducts } from '../data';
 import { mobile } from "../Responsive";
@@ -171,6 +174,7 @@ const Cart = () => {
   }
   return (
     <Container>
+      <Navbar/>
           <Wrapper>
         <Title>YOUR BAG</Title>
         <Top>
@@ -253,6 +257,8 @@ const Cart = () => {
           </Summary>
         </Bottom>
       </Wrapper>
+      <Enquiry/>
+      <Footer/>
 
     </Container>
   )

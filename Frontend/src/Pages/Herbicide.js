@@ -3,6 +3,7 @@ import { HerbiItems } from '../data'
 import HerbiItem from "../Components/HerbiItem"
 import styled from 'styled-components';
 import { mobile } from "../Responsive";
+import Navbar from '../Components/Navbar';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -42,6 +43,7 @@ const Option = styled.option``;
 const Herbicide = () => {
   return (
     <Container>
+      <Navbar/>
       <Title>Herbicide</Title>
       <FilterContainer>
         <Filter>

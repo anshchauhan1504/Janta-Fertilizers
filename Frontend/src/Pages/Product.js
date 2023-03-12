@@ -1,8 +1,13 @@
 import styled from "styled-components"
 import { Add, Remove } from "@material-ui/icons";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { FungiItems, HerbiItems, InsectItems, popularProducts } from "../data";
 import { mobile } from "../Responsive";
+import Navbar from "../Components/Navbar";
+import Enquiry from "../Components/Enquiry";
+import Footer from "../Components/Footer";
+import { publicRequest } from "../requestmethods";
+import { useEffect, useState } from "react";
 const Container=styled.div`
  
 `
@@ -49,6 +54,7 @@ const AddContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  cursor: pointer;
   ${mobile({ width: "100%" })}
 `;
 
@@ -82,46 +88,71 @@ const Button = styled.button`
 `;
 const Product = () => {
   const navigate=useNavigate();
-  const { id } = useParams();
-  let item;
-  if(id>=13 && id<=20){
-    item = FungiItems.find((item) => item.id === parseInt(id));
-  }
-  else if(id>=5 && id<=12 ){
-    item = popularProducts.find((item) => item.id === parseInt(id));
-  }
-  else if(id>=21 && id<=28){
-    item = HerbiItems.find((item) => item.id === parseInt(id));
-  }
-  else if(id>=29 && id<=36){
-    item = InsectItems.find((item) => item.id === parseInt(id));
+  const location = useLocation();
+  const id = location.pathname.split("/")[2];
+  const [product, setProduct] = useState({});
+  const [quantity,setQuantity]=useState(1);
+  useEffect(() => {
+    const getProduct = async () => {
+      try {
+        const res = await publicRequest.get("/products/find/" + id);
+        setProduct(res.data);
+      } catch {}
+    };
+    getProduct();
+  }, [id]);
 
-  }
+  const handlequantity = (type) => {
+    if (type === "dec") {
+      quantity > 1 && setQuantity(quantity - 1); //Basic logic
+    } else {
+      setQuantity(quantity + 1); 
+    }
+  };
+
+  // const { id } = useParams();
+  // let item;
+  // if(id>=13 && id<=20){
+  //   item = FungiItems.find((item) => item.id === parseInt(id));
+  // }
+  // else if(id>=5 && id<=12 ){
+  //   item = popularProducts.find((item) => item.id === parseInt(id));
+  // }
+  // else if(id>=21 && id<=28){
+  //   item = HerbiItems.find((item) => item.id === parseInt(id));
+  // }
+  // else if(id>=29 && id<=36){
+  //   item = InsectItems.find((item) => item.id === parseInt(id));
+
+  // }
 
   // console.log(item);
   return (
     <Container>
+      <Navbar/>
         <Wrapper>
             <ImgContainer>
-            <Image src={item.img} />
+            <Image src={product.img} />
             </ImgContainer>
             <InfoContainer>
-          <Title>{item.title}</Title>
+          <Title>{product.title}</Title>
           <Desc>
-            {item.desc}
+            {product.desc}
           </Desc>
-          <Price>{item.price}</Price>
+          <Price>₹{product.price}</Price>
           <AddContainer>
             <AmountContainer>
-              <Remove />
-              <Amount>1</Amount>
-              <Add />
+              <Remove onClick={() => handlequantity("dec")}/>
+              <Amount>{quantity}</Amount>
+              <Add onClick={() => handlequantity("inc")}/>
             </AmountContainer>
-            <Button onClick={()=>navigate(`/Cart/${id}`)}>ADD TO CART</Button>
+            {/* onClick={()=>navigate(`/Cart/${id}`)} */}
+            <Button  >ADD TO CART</Button>
           </AddContainer>
         </InfoContainer>
         </Wrapper>
-
+        <Enquiry/>
+      <Footer/>
     </Container>
   )
 }

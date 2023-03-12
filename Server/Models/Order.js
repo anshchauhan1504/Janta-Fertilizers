@@ -23,4 +23,4 @@ const OrderSchema=new mongoose.Schema(
     {timestamps:true} //It will going to create our createdAt time and updated at time
 );
 
-module.exports=mongoose.model("User",OrderSchema);
+module.exports=mongoose.model("Order",OrderSchema);

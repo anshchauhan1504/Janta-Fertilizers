@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { FungiItems } from "../data";
 import FungiItem from "../Components/FungiItem";
 import { mobile } from "../Responsive";
+import Navbar from "../Components/Navbar";
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -41,7 +42,9 @@ const Option = styled.option``;
 
 const Fungicide = () => {
   return (
+    
     <Container>
+      <Navbar/>
       <Title>Fungicide</Title>
       <FilterContainer>
       <Filter>
