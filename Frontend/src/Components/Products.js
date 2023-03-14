@@ -23,13 +23,16 @@ const Products = ({cat,sort}) => {
             : "http://localhost:5000/api/products"
         );
         setProducts(res.data);
+        
       } catch (err) {
         console.log(err)
       }
     };
     getProducts();
+    
   }, [cat]);
-
+const nullCategoryProducts = products.filter((product) => product.categories.length === 0);
+  // console.log(nullCategoryProducts);
   useEffect(() => {
     if (sort === "newest") {
       setSortedProducts((prev) =>
@@ -52,9 +55,12 @@ const Products = ({cat,sort}) => {
         ? sortproducts.map((item) => (
             <ProductItem item={item} key={item._id} />
           ))
-        : products
-            .slice(0, 8)
-            .map((item) => <ProductItem item={item} key={item._id} />)}
+        : nullCategoryProducts.length > 0
+          ? nullCategoryProducts
+              .slice(0, 8)
+              .map((item) => <ProductItem item={item} key={item._id} />)
+          : <div>No products found.</div>
+      }
     </Container>
   );
 };

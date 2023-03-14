@@ -1,13 +1,15 @@
-import { Add, Remove } from '@material-ui/icons';
-import React from 'react'
-import { useNavigate, useParams } from 'react-router-dom';
-import styled from 'styled-components';
-import Enquiry from '../Components/Enquiry';
-import Footer from '../Components/Footer';
-import Navbar from '../Components/Navbar';
-
-import { FungiItems, HerbiItems, InsectItems, popularProducts } from '../data';
+import { Add, Remove } from "@material-ui/icons";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import styled from "styled-components";
+import Enquiry from "../Components/Enquiry";
+import Footer from "../Components/Footer";
+import Navbar from "../Components/Navbar";
+import { FungiItems, HerbiItems, InsectItems, popularProducts } from "../data";
 import { mobile } from "../Responsive";
+import StripeCheckout from "react-stripe-checkout";
+import { userRequest } from "../requestmethods";
 
 const Container = styled.div``;
 
@@ -156,29 +158,48 @@ const Button = styled.button`
   font-weight: 600;
 `;
 const Cart = () => {
-  const { id } = useParams();
-  const navigate=useNavigate();
-  let item;
-  if(id>=13 && id<=20){
-    item = FungiItems.find((item) => item.id === parseInt(id));
-  }
-  else if(id>=5 && id<=12 ){
-    item = popularProducts.find((item) => item.id === parseInt(id));
-  }
-  else if(id>=21 && id<=28){
-    item = HerbiItems.find((item) => item.id === parseInt(id));
-  }
-  else if(id>=29 && id<=36){
-    item = InsectItems.find((item) => item.id === parseInt(id));
+  // const { id } = useParams();
+  const navigate = useNavigate();
+  const cart = useSelector((state) => state.cart);
+  const key = process.env.REACT_APP_STRIPE;
+  const [stripetoken, setStripetoken] = useState(null);
+  const onToken = (token) => {
+    setStripetoken(token);
+  };
 
-  }
+  useEffect(() => {
+    const makeRequest = async () => {
+      try {
+        const res = await userRequest.post("/checkout/payment", {
+          tokenId: stripetoken.id,
+          amount: 500,
+        });
+        navigate("/Success", {
+          state: {
+            stripeData: res.data,
+            products: cart,
+          },
+        });
+      } catch (err){
+        console.log(err)
+      }
+    };
+
+    stripetoken && makeRequest();
+  }, [stripetoken, cart.total, navigate]);
+
+  //Explanation of useEffect
+  //   we are performing an asynchronous operation using userRequest.post to submit a payment with Stripe. Once the payment has been successfully processed, we use history.push (or navigate) to navigate to the "/success" page and pass along two pieces of data as state: stripeData and products. stripeData contains the data returned by Stripe in response to the payment request, while products contains the cart items that were submitted for payment.
+
+  // This effect depends on the stripetoken, cart.total, and history variables, so it will re-run whenever any of these variables change. If stripetoken is truthy (i.e. if a token has been obtained from Stripe), the makeRequest function is called. This function sends a POST request to our server with the tokenId and amount parameters. If the request is successful, the client is redirected to the "/success" page with the stripeData and products data. If there is an error in the request or the stripetoken is falsy, nothing happens.
+
   return (
     <Container>
-      <Navbar/>
-          <Wrapper>
-        <Title>YOUR BAG</Title>
+      <Navbar />
+      <Wrapper>
+        <Title>YOUR ITEMS</Title>
         <Top>
-          <TopButton onClick={()=>navigate(`/`)}>CONTINUE SHOPPING</TopButton>
+          <TopButton onClick={() => navigate(`/`)}>CONTINUE SHOPPING</TopButton>
           <TopTexts>
             <TopText>Shopping Bag(2)</TopText>
             <TopText>Your Wishlist (0)</TopText>
@@ -187,81 +208,71 @@ const Cart = () => {
         </Top>
         <Bottom>
           <Info>
-            <Product>
-              <ProductDetail>
-                <Image src={item.img} />
-                <Details>
-                  <ProductName>
-                    <b>Product:</b> {item.title}
-                  </ProductName>
-                  <ProductId>
-                    <b>ID:</b> {id}
-                  </ProductId>
-                </Details>
-              </ProductDetail>
-              <PriceDetail>
-                <ProductAmountContainer>
-                  <Add />
-                  <ProductAmount>2</ProductAmount>
-                  <Remove />
-                </ProductAmountContainer>
-                <ProductPrice>Rs 30</ProductPrice>
-              </PriceDetail>
-            </Product>
+            {cart.products.map((product) => (
+              <Product>
+                <ProductDetail>
+                  <Image src={product.img} />
+                  <Details>
+                    <ProductName>
+                      <b>Product:</b> {product.title}
+                    </ProductName>
+                    <ProductId>
+                      <b>ID:</b> {product._id}
+                    </ProductId>
+                  </Details>
+                </ProductDetail>
+                <PriceDetail>
+                  <ProductAmountContainer>
+                    <Add />
+                    <ProductAmount>{product.quantity}</ProductAmount>
+                    <Remove />
+                  </ProductAmountContainer>
+                  <ProductPrice>
+                    ₹ {product.price * product.quantity}
+                  </ProductPrice>
+                </PriceDetail>
+              </Product>
+            ))}
             <Hr />
-            <Product>
-              <ProductDetail>
-                <Image src="https://i.pinimg.com/originals/2d/af/f8/2daff8e0823e51dd752704a47d5b795c.png" />
-                <Details>
-                  <ProductName>
-                    <b>Product:</b> HAKURA T-SHIRT
-                  </ProductName>
-                  <ProductId>
-                    <b>ID:</b> 93813718293
-                  </ProductId>
-                  <ProductColor color="gray" />
-                  <ProductSize>
-                    <b>Size:</b> M
-                  </ProductSize>
-                </Details>
-              </ProductDetail>
-              <PriceDetail>
-                <ProductAmountContainer>
-                  <Add />
-                  <ProductAmount>1</ProductAmount>
-                  <Remove />
-                </ProductAmountContainer>
-                <ProductPrice>$ 20</ProductPrice>
-              </PriceDetail>
-            </Product>
           </Info>
           <Summary>
             <SummaryTitle>ORDER SUMMARY</SummaryTitle>
             <SummaryItem>
               <SummaryItemText>Subtotal</SummaryItemText>
-              <SummaryItemPrice>₹ 80</SummaryItemPrice>
+              <SummaryItemPrice>₹ {cart.total}</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem>
               <SummaryItemText>Estimated Shipping</SummaryItemText>
-              <SummaryItemPrice>$ 5.90</SummaryItemPrice>
+              <SummaryItemPrice>₹ 100</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem>
               <SummaryItemText>Shipping Discount</SummaryItemText>
-              <SummaryItemPrice>$ -5.90</SummaryItemPrice>
+              <SummaryItemPrice>₹ -20</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem type="total">
               <SummaryItemText>Total</SummaryItemText>
-              <SummaryItemPrice>$ 80</SummaryItemPrice>
+              <SummaryItemPrice>₹{cart.total}</SummaryItemPrice>
             </SummaryItem>
-            <Button>CHECKOUT NOW</Button>
+            <StripeCheckout
+              name="Janta Fertilizers"
+              image="http://www.dayalgroup.com/img/dg-logo.jpg"
+              billingAddress
+              shippingAddress
+              description={`Your total is ₹${cart.total}`}
+              amount={cart.total * 100}
+              token={onToken}
+              stripeKey={key}
+              currency="INR"
+            >
+              <Button>CHECKOUT NOW</Button>
+            </StripeCheckout>
           </Summary>
         </Bottom>
       </Wrapper>
-      <Enquiry/>
-      <Footer/>
-
+      <Enquiry />
+      <Footer />
     </Container>
-  )
-}
+  );
+};
 
-export default Cart
+export default Cart;

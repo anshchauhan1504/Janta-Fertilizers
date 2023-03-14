@@ -7,8 +7,9 @@ const authRoute = require('./Routes/auth');
 const productRoute = require('./Routes/product');
 const cartRoute = require('./Routes/cart');
 const orderRoute = require('./Routes/order');
-
+const stripeRoute = require("./Routes/stripe");
 dotenv.config();
+process.env.NODE_OPTIONS = "--unhandled-rejections=strict";
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => console.log('Db Connection Successfull!'))
@@ -31,6 +32,7 @@ app.use('/api/auth', authRoute);
 app.use('/api/products', productRoute);
 app.use('/api/carts', cartRoute);
 app.use('/api/orders', orderRoute);
+app.use("/api/checkout", stripeRoute);
 
 app.listen(process.env.PORT || 5000, () => {
   console.log('Server is running!');

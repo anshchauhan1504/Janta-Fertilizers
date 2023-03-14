@@ -1,6 +1,6 @@
-import styled from "styled-components"
+import styled from "styled-components";
 import { Add, Remove } from "@material-ui/icons";
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { FungiItems, HerbiItems, InsectItems, popularProducts } from "../data";
 import { mobile } from "../Responsive";
 import Navbar from "../Components/Navbar";
@@ -8,14 +8,13 @@ import Enquiry from "../Components/Enquiry";
 import Footer from "../Components/Footer";
 import { publicRequest } from "../requestmethods";
 import { useEffect, useState } from "react";
-const Container=styled.div`
- 
-`
+import { addproduct } from "../Redux/cartredux";
+import { useDispatch } from "react-redux";
+const Container = styled.div``;
 const Wrapper = styled.div`
   padding: 50px;
   display: flex;
-  ${mobile({ padding: "10px", flexDirection:"column" })}
- 
+  ${mobile({ padding: "10px", flexDirection: "column" })}
 `;
 
 const ImgContainer = styled.div`
@@ -28,7 +27,6 @@ const Image = styled.img`
   margin-left: 200px;
   object-fit: cover;
   ${mobile({ height: "40vh" })}
- 
 `;
 
 const InfoContainer = styled.div`
@@ -82,16 +80,17 @@ const Button = styled.button`
   background-color: white;
   cursor: pointer;
   font-weight: 500;
-  &:hover{
-      background-color: #f8f4f4;
+  &:hover {
+    background-color: #f8f4f4;
   }
 `;
 const Product = () => {
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const location = useLocation();
   const id = location.pathname.split("/")[2];
   const [product, setProduct] = useState({});
-  const [quantity,setQuantity]=useState(1);
+  const [quantity, setQuantity] = useState(1);
+  const dispatch = useDispatch();
   useEffect(() => {
     const getProduct = async () => {
       try {
@@ -106,55 +105,46 @@ const Product = () => {
     if (type === "dec") {
       quantity > 1 && setQuantity(quantity - 1); //Basic logic
     } else {
-      setQuantity(quantity + 1); 
+      setQuantity(quantity + 1);
     }
   };
 
-  // const { id } = useParams();
-  // let item;
-  // if(id>=13 && id<=20){
-  //   item = FungiItems.find((item) => item.id === parseInt(id));
-  // }
-  // else if(id>=5 && id<=12 ){
-  //   item = popularProducts.find((item) => item.id === parseInt(id));
-  // }
-  // else if(id>=21 && id<=28){
-  //   item = HerbiItems.find((item) => item.id === parseInt(id));
-  // }
-  // else if(id>=29 && id<=36){
-  //   item = InsectItems.find((item) => item.id === parseInt(id));
+  // The addproduct action creator takes an argument which is an object representing the product being added to the cart. In this case, you are passing an object that is a copy of the product state, with an additional quantity property.
+  // The addproduct action creator is called with an argument that is an object representing the product being added to the cart.
+  // The object being passed to the action creator is a copy of the product state, with an additional quantity property. The quantity property is set to the value of the quantity state, which represents the quantity of the product being added to the cart.
+  // The action creator returns an action object that has a type property set to "ADD_PRODUCT" and a payload property set to the object representing the product being added to the cart.
+  // The dispatch function is called with the action object returned by the action creator. This will trigger a state update that adds the product to the shopping cart.
+  const handleClick = () => {
+    dispatch(addproduct({ ...product, quantity }));
+  };
 
-  // }
 
-  // console.log(item);
   return (
     <Container>
-      <Navbar/>
-        <Wrapper>
-            <ImgContainer>
-            <Image src={product.img} />
-            </ImgContainer>
-            <InfoContainer>
+      <Navbar />
+      <Wrapper>
+        <ImgContainer>
+          <Image src={product.img} />
+        </ImgContainer>
+        <InfoContainer>
           <Title>{product.title}</Title>
-          <Desc>
-            {product.desc}
-          </Desc>
+          <Desc>{product.desc}</Desc>
           <Price>₹{product.price}</Price>
           <AddContainer>
             <AmountContainer>
-              <Remove onClick={() => handlequantity("dec")}/>
+              <Remove onClick={() => handlequantity("dec")} />
               <Amount>{quantity}</Amount>
-              <Add onClick={() => handlequantity("inc")}/>
+              <Add onClick={() => handlequantity("inc")} />
             </AmountContainer>
             {/* onClick={()=>navigate(`/Cart/${id}`)} */}
-            <Button  >ADD TO CART</Button>
+            <Button onClick={handleClick}>ADD TO CART</Button>
           </AddContainer>
         </InfoContainer>
-        </Wrapper>
-        <Enquiry/>
-      <Footer/>
+      </Wrapper>
+      <Enquiry />
+      <Footer />
     </Container>
-  )
-}
+  );
+};
 
-export default Product
+export default Product;

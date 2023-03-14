@@ -4,6 +4,7 @@ import { Search, ShoppingBasketOutlined } from "@material-ui/icons";
 import { Badge } from "@material-ui/core";
 import { useNavigate } from "react-router-dom";
 import { mobile } from "../Responsive";
+import { useSelector } from "react-redux";
 const Container = styled.div`
   //Styled components
   height: 60px;
@@ -63,6 +64,7 @@ margin-left: 25px;
 ${mobile({ fontSize: "12px", marginLeft: "10px" })}
 `
 const Navbar = () => {
+  const cartProducts = useSelector(state=>state.cart.quantity); //The cartProducts variable returned by useSelector will contain the current value of the products array in the cart slice of the Redux store state. When the value of this array changes in the store state, useSelector will automatically trigger a re-render of the component to update the UI with the new data.
   const navigate=useNavigate();
   return (
     <Container>
@@ -79,8 +81,8 @@ const Navbar = () => {
             <MenuItem onClick={()=>navigate(`/Register/`)}>Register</MenuItem>
             <MenuItem onClick={()=>navigate(`/Login/`)}>Sign In</MenuItem>
             <MenuItem>
-            <Badge badgeContent={4} color="primary">
-              <ShoppingBasketOutlined/>
+            <Badge badgeContent={cartProducts} color="primary">
+              <ShoppingBasketOutlined onClick={()=>navigate(`/Cart`)}/>
             </Badge>
             </MenuItem>
         </Right>

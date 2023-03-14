@@ -12,6 +12,8 @@ import Product from "./Pages/Product";
 import Register from "./Pages/Register";
 import Login from "./Pages/Login";
 import Cart from "./Pages/Cart";
+import Success from "./Pages/Success";
+import { useSelector } from "react-redux";
 
 const useStyles=makeStyles(()=>({
   App: {
@@ -23,7 +25,7 @@ const useStyles=makeStyles(()=>({
   
 }));
 const App = () => {
-  const user=true;
+  const user=useSelector((state)=>state.user.currentUser);
   const classes =useStyles();
   return (
     <BrowserRouter>
@@ -38,7 +40,8 @@ const App = () => {
         <Route path="/Register/" element={user ? <Navigate to="/" /> : <Register />} exact/>
         <Route path="/Login/" element={user ? <Navigate to="/" /> : <Login />} exact/>
         <Route path="/products/:category" element={<ProductList/>} exact/>
-        <Route path="/Cart/:id" element={<Cart/>} exact/>
+        <Route path="/Cart" element={<Cart/>} exact/>
+        <Route path="/Success" element={<Success/>} exact/>
       </Routes>
 
     </div>
