@@ -8,7 +8,7 @@ import Enquiry from "../Components/Enquiry";
 import Footer from "../Components/Footer";
 import { publicRequest } from "../requestmethods";
 import { useEffect, useState } from "react";
-import { addproduct } from "../Redux/cartredux";
+import { addproduct, removeproduct } from "../Redux/cartredux";
 import { useDispatch } from "react-redux";
 const Container = styled.div``;
 const Wrapper = styled.div`
@@ -77,12 +77,38 @@ const Amount = styled.span`
 const Button = styled.button`
   padding: 15px;
   border: 2px solid teal;
+  display:flex;
   background-color: white;
+  justify-content: space-between;
+ align-items: center;
+  margin-left: 10px;
   cursor: pointer;
   font-weight: 500;
   &:hover {
     background-color: #f8f4f4;
   }
+`;
+const Buttonadd = styled.button`
+  padding: 15px;
+  border: 2px solid teal;
+  display:flex;
+  background-color: white;
+  align-items: center;
+  justify-content:space-between;
+  cursor: pointer;
+  margin-left: 10px;
+  font-weight: 500;
+  &:hover {
+    background-color: #f8f4f4;
+  }
+`;
+const RemoveContainer = styled.div`
+  /* display: flex; */
+  /* justify-content: space-between; */
+  /* align-items: center; */
+  margin-top: 10px;
+  
+ 
 `;
 const Product = () => {
   const navigate = useNavigate();
@@ -117,7 +143,9 @@ const Product = () => {
   const handleClick = () => {
     dispatch(addproduct({ ...product, quantity }));
   };
-
+  const handleClick1=()=>{
+    dispatch(removeproduct({...product,quantity}));
+  }
 
   return (
     <Container>
@@ -137,8 +165,14 @@ const Product = () => {
               <Add onClick={() => handlequantity("inc")} />
             </AmountContainer>
             {/* onClick={()=>navigate(`/Cart/${id}`)} */}
-            <Button onClick={handleClick}>ADD TO CART</Button>
+            <Buttonadd onClick={handleClick}>ADD TO CART</Buttonadd>
+            <Button onClick={handleClick1}>REMOVE FROM CART</Button>
+           
           </AddContainer>
+          
+          <RemoveContainer>
+            
+          </RemoveContainer>
         </InfoContainer>
       </Wrapper>
       <Enquiry />

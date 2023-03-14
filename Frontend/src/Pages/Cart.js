@@ -1,7 +1,7 @@
 import { Add, Remove } from "@material-ui/icons";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import Enquiry from "../Components/Enquiry";
 import Footer from "../Components/Footer";
@@ -10,7 +10,9 @@ import { FungiItems, HerbiItems, InsectItems, popularProducts } from "../data";
 import { mobile } from "../Responsive";
 import StripeCheckout from "react-stripe-checkout";
 import { userRequest } from "../requestmethods";
-
+import { useDispatch } from "react-redux";
+import { setProducts, setTotal, setQuantity } from "../Redux/cartredux";
+import { addproduct,removeproduct,clearcart } from "../Redux/cartredux";
 const Container = styled.div``;
 
 const Wrapper = styled.div`
@@ -85,15 +87,6 @@ const ProductName = styled.span``;
 
 const ProductId = styled.span``;
 
-const ProductColor = styled.div`
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background-color: ${(props) => props.color};
-`;
-
-const ProductSize = styled.span``;
-
 const PriceDetail = styled.div`
   flex: 1;
   display: flex;
@@ -106,6 +99,7 @@ const ProductAmountContainer = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 20px;
+  cursor: pointer;
 `;
 
 const ProductAmount = styled.div`
@@ -162,7 +156,9 @@ const Cart = () => {
   const navigate = useNavigate();
   const cart = useSelector((state) => state.cart);
   const key = process.env.REACT_APP_STRIPE;
+  const [quantity, setQuantity] = useState(1);
   const [stripetoken, setStripetoken] = useState(null);
+  const dispatch = useDispatch();
   const onToken = (token) => {
     setStripetoken(token);
   };
@@ -180,18 +176,34 @@ const Cart = () => {
             products: cart,
           },
         });
-      } catch (err){
-        console.log(err)
+      } catch (err) {
+        console.log(err);
       }
     };
 
     stripetoken && makeRequest();
   }, [stripetoken, cart.total, navigate]);
+  
+  const product=[];
 
   //Explanation of useEffect
   //   we are performing an asynchronous operation using userRequest.post to submit a payment with Stripe. Once the payment has been successfully processed, we use history.push (or navigate) to navigate to the "/success" page and pass along two pieces of data as state: stripeData and products. stripeData contains the data returned by Stripe in response to the payment request, while products contains the cart items that were submitted for payment.
 
   // This effect depends on the stripetoken, cart.total, and history variables, so it will re-run whenever any of these variables change. If stripetoken is truthy (i.e. if a token has been obtained from Stripe), the makeRequest function is called. This function sends a POST request to our server with the tokenId and amount parameters. If the request is successful, the client is redirected to the "/success" page with the stripeData and products data. If there is an error in the request or the stripetoken is falsy, nothing happens.
+  const handleClick = (product,quantity) => {
+    dispatch(addproduct({ ...product, quantity }));
+  };
+  const handleClick1=(product,quantity)=>{
+    dispatch(removeproduct({...product,quantity}));
+
+  }
+  // const handlequantity = (type) => {
+  //   if (type === "dec") {
+  //     quantity > 1 && setQuantity(quantity - 1); //Basic logic
+  //   } else {
+  //     setQuantity(quantity + 1);
+  //   }
+  // };
 
   return (
     <Container>
@@ -223,9 +235,13 @@ const Cart = () => {
                 </ProductDetail>
                 <PriceDetail>
                   <ProductAmountContainer>
-                    <Add />
+                    <Add
+                      onClick={()=>{handleClick(product,product.quantity)}}
+                    />
                     <ProductAmount>{product.quantity}</ProductAmount>
-                    <Remove />
+                    <Remove
+                      onClick={()=>{handleClick1(product,product.quantity)}}
+                    />
                   </ProductAmountContainer>
                   <ProductPrice>
                     ₹ {product.price * product.quantity}

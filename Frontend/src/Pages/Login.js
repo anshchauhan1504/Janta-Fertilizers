@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { login } from "../Redux/apiCalls";
 import {mobile} from "../Responsive";
+import axios from "axios";
 const Container = styled.div`
   width: 100vw;
   height: 100vh;
@@ -69,32 +70,63 @@ const Error = styled.span`
   color: red;
 `;
 
-const Login = () => {
-  const [username,setusername]=useState("");
+const Login = ({setLoginUser}) => {
+  const [email,setemail]=useState("");
   const [password,setpassword]=useState("");
-  const dispatch=useDispatch();
-  const {isFetching,error}=useSelector((state)=>state.user);
+  const [error,seterror]=useState("");
+  const navigate=useNavigate();
+
   const handlelogin=async(e)=>{
     e.preventDefault();
+    if(!email || !password){
+      seterror("Please fill all the required fields.");
+      return;
+    }
+
     try {
-      await login(dispatch,{username,password});
-      
+      const res=await axios.post("http://localhost:5000/api/auth/login",{
+        email,
+        password,
+      })
+      console.log(res.data);
+      setemail("");
+      setpassword("");
+      navigate("/");
     } catch (error) {
-      console.log(error)
+      console.log(error);
+      if (error.response && error.response.data.message) {
+        seterror(error.response.data.message);
+      } else {
+        seterror("Something went wrong. Please try again later.");
+      }
       
     }
-    
   }
-  const navigate=useNavigate();
+  // const dispatch=useDispatch();
+  // const {isFetching,error}=useSelector((state)=>state.user);
+  // const handlelogin=async(e)=>{
+  //   e.preventDefault();
+  //   try {
+  //     await login(dispatch,{email,password});
+      
+  //   } catch (error) {
+  //     console.log(error)
+      
+  //   }
+    
+  // }
+  
   return (
     <Container>
       <Wrapper>
         <Title>SIGN IN</Title>
         <Form>
-          <Input placeholder="username" onChange={(e)=>setusername(e.target.value)}/>
-          <Input placeholder="password" type="password" onChange={(e)=>setpassword(e.target.value)} />
-          <Button onClick={handlelogin} disabled={isFetching}>LOGIN</Button>
-          {error && <Error>Something went wrong...</Error>}
+          <Input placeholder="Email" value={email} type="email" onChange={(e)=>setemail(e.target.value)}/>
+          <Input placeholder="Password" value={password} type="password" onChange={(e)=>setpassword(e.target.value)} />
+          <Button onClick={handlelogin} >LOGIN</Button>
+          {error && <Error>{error}</Error>}
+          {/* disabled={isFetching} */}
+          {/* {error && <Error>Something went wrong...</Error>} */}
           <Link>DO NOT YOU REMEMBER THE PASSWORD?</Link>
           <Link onClick={()=>navigate(`/Register/`)}>CREATE A NEW ACCOUNT</Link>
         </Form>

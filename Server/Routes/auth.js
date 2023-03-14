@@ -14,6 +14,7 @@ router.post("/register",async(req,res)=>{ //Here we are using async await becaus
     try {
         const savedUser=await newUser.save(); //Saving our user to database
         res.status(201).json(savedUser);
+        alert("Successfully registered");
         
     } catch (error) {
         res.status(500).json(error);
@@ -24,7 +25,7 @@ router.post("/register",async(req,res)=>{ //Here we are using async await becaus
 //LOGIN
 router.post("/login",async(req,res)=>{
     try {
-        const user=await User.findOne({username:req.body.username});
+        const user=await User.findOne({email:req.body.email});
         !user && res.status(401).json("Wrong credentials")
         const hashedPassword=CryptoJS.AES.decrypt(user.password, process.env.PASS_SEC);
         const pssword=hashedPassword.toString(CryptoJS.enc.Utf8);
