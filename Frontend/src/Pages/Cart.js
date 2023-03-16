@@ -184,19 +184,11 @@ const Cart = () => {
     stripetoken && makeRequest();
   }, [stripetoken, cart.total, navigate]);
   
-  const product=[];
 
   //Explanation of useEffect
   //   we are performing an asynchronous operation using userRequest.post to submit a payment with Stripe. Once the payment has been successfully processed, we use history.push (or navigate) to navigate to the "/success" page and pass along two pieces of data as state: stripeData and products. stripeData contains the data returned by Stripe in response to the payment request, while products contains the cart items that were submitted for payment.
 
   // This effect depends on the stripetoken, cart.total, and history variables, so it will re-run whenever any of these variables change. If stripetoken is truthy (i.e. if a token has been obtained from Stripe), the makeRequest function is called. This function sends a POST request to our server with the tokenId and amount parameters. If the request is successful, the client is redirected to the "/success" page with the stripeData and products data. If there is an error in the request or the stripetoken is falsy, nothing happens.
-  const handleClick = (product,quantity) => {
-    dispatch(addproduct({ ...product, quantity }));
-  };
-  const handleClick1=(product,quantity)=>{
-    dispatch(removeproduct({...product,quantity}));
-
-  }
   // const handlequantity = (type) => {
   //   if (type === "dec") {
   //     quantity > 1 && setQuantity(quantity - 1); //Basic logic
@@ -236,11 +228,9 @@ const Cart = () => {
                 <PriceDetail>
                   <ProductAmountContainer>
                     <Add
-                      onClick={()=>{handleClick(product,product.quantity)}}
                     />
                     <ProductAmount>{product.quantity}</ProductAmount>
                     <Remove
-                      onClick={()=>{handleClick1(product,product.quantity)}}
                     />
                   </ProductAmountContainer>
                   <ProductPrice>

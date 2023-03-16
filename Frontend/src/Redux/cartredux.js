@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-
-const cartSlice = createSlice({ //This function takes an object that defines the initial state of the slice and a set of reducer functions that operate on that state.
+const cartSlice = createSlice({
   name: "cart",
   initialState: {
     products: [],
@@ -14,17 +13,32 @@ const cartSlice = createSlice({ //This function takes an object that defines the
       state.products.push(action.payload);
       state.total += action.payload.price * action.payload.quantity;
     },
-    
-    clearcart:(state)=>{
-      state.products=[];
-      state.quantity=0;
-      state.total=0;
-    }
+    removeproduct: (state, action) => {
+      const index = state.products.findIndex(
+        (product) => product._id === action.payload.id
+      );
+      if (index !== -1 && state.quantity > 0) {
+        const product = state.products[index];
+        state.quantity -= 1;
+        state.total -= product.price;
+        if (product.quantity > 1) {
+          product.quantity -= 1;
+        } else {
+          state.products.splice(index, 1);
+        }
+      }
+    },
+    clearcart: (state) => {
+      state.products = [];
+      state.quantity = 0;
+      state.total = 0;
+    },
   },
 });
 
-export const { addproduct,removeproduct,clearcart } = cartSlice.actions;
+export const { addproduct, removeproduct, clearcart } = cartSlice.actions;
 export default cartSlice.reducer;
+
 
 // The reducers object contains a single reducer function named addproduct. This reducer function updates the state of the cart slice by adding a new product to the products array, increasing the quantity and updating the total price based on the price and quantity of the added product.
 

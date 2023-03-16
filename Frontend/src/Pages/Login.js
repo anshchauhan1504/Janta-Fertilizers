@@ -91,7 +91,7 @@ const Login = ({setLoginUser}) => {
       console.log(res.data);
       setemail("");
       setpassword("");
-      navigate("/");
+      navigate("/"); //Home page
     } catch (error) {
       console.log(error);
       if (error.response && error.response.data.message) {

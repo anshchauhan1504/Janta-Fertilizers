@@ -1,50 +1,74 @@
-const router=require("express").Router();
-const User=require("../Models/User")
-const CryptoJS = require("crypto-js")
-const jwt=require("jsonwebtoken")
+const router = require("express").Router();
+const User = require("../Models/User");
+const bcrypt = require("bcrypt");
+// const CryptoJS = require("crypto-js")
+// const jwt=require("jsonwebtoken")
 //REGISTER
 
-
-router.post("/register",async(req,res)=>{ //Here we are using async await because it may take time to save user in our database due to internet connectiom, monogodb server etc so it is advised to use async await here.
-    const newUser=new User({
-        username:req.body.username,
-        email:req.body.email,
-        password:CryptoJS.AES.encrypt(req.body.password, process.env.PASS_SEC ).toString(),
-    });
+router.post("/signup", async (req, res) => {
+    const { email, password } = req.body;
+  
+    const crypto = require("crypto");
+    const userId = crypto.randomBytes(16).toString("hex");
+  
     try {
-        const savedUser=await newUser.save(); //Saving our user to database
-        res.status(201).json(savedUser);
-        alert("Successfully registered");
-        
-    } catch (error) {
-        res.status(500).json(error);
-        
-    }  
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      const newUser = new User({
+        email,
+        password: hashedPassword,
+        userId,
+      });
+  
+      await newUser.save();
+  
+      res.cookie("userId", userId);
+      res.status(200).send("User created successfully");
+    } catch (err) {
+      if (err.code === 11000) {
+        // Duplicate key error, handle it accordingly
+        if (err.keyPattern.email) {
+          res.status(409).send("Email already exists");
+        } else if (err.keyPattern.userId) {
+          res.status(409).send("User ID already exists");
+        } else {
+          res.status(500).send("Error creating user");
+        }
+      } else {
+        // Other error, return a generic message
+        console.error(err);
+        res.status(500).send("Error creating user");
+      }
+    }
+  });
+
+//LOG IN
+router.post("/signin", (req, res) => {
+  const { email, password } = req.body; // assuming email and password are passed in the request body
+
+  // find the user in the database by email
+  User.findOne({ email }, (err, user) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Error finding user");
+    } else if (!user) {
+      res.status(401).send("User not found");
+    } else {
+      // check if the password is correct
+      user.comparePassword(password, (err, isMatch) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send("Error checking password");
+        } else if (!isMatch) {
+          res.status(401).send("Incorrect password");
+        } else {
+          // set the userId as a cookie
+          res.cookie("userId", user.userId);
+          res.status(200).send("User signed in successfully");
+        }
+      });
+    }
+  });
 });
 
-//LOGIN
-router.post("/login",async(req,res)=>{
-    try {
-        const user=await User.findOne({email:req.body.email});
-        !user && res.status(401).json("Wrong credentials")
-        const hashedPassword=CryptoJS.AES.decrypt(user.password, process.env.PASS_SEC);
-        const pssword=hashedPassword.toString(CryptoJS.enc.Utf8);
-        pssword!==req.body.password && res.status(401).json("Wrong credentials");
-
-        const accessToken=jwt.sign({
-            id:user._id,
-            isAdmin: user.isAdmin,
-        },process.env.JWT_SEC,
-        {expiresIn:"3d"}
-        )
-        
-        const {password,...others}=user._doc; //Make our password invisible from database for more security
-        res.status(200).json({...others,accessToken});
-    } catch (error) {
-        res.status(500).json(error)
-        
-    }
-    
-})
-
-module.exports=router;
+module.exports = router;

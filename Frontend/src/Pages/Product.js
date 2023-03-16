@@ -126,7 +126,6 @@ const Product = () => {
     };
     getProduct();
   }, [id]);
-
   const handlequantity = (type) => {
     if (type === "dec") {
       quantity > 1 && setQuantity(quantity - 1); //Basic logic
@@ -143,9 +142,13 @@ const Product = () => {
   const handleClick = () => {
     dispatch(addproduct({ ...product, quantity }));
   };
-  const handleClick1=()=>{
-    dispatch(removeproduct({...product,quantity}));
-  }
+  const handleClick1 = () => {
+    console.log("Removing product:", product._id);
+    dispatch(removeproduct({ id: product._id }));
+  };
+
+  console.log("Product:", product);
+  console.log("Dispatch function:", dispatch);
 
   return (
     <Container>

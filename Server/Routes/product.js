@@ -1,13 +1,9 @@
 const router = require("express").Router();
 const Product = require("../Models/Product");
-const {
-  verifytoken,
-  verifytokenandauthorization,
-  verifytokenandadmin,
-} = require("./verifytoken");
+
 
 //Create new product
-router.post("/", verifytokenandadmin, async (req, res) => {
+router.post("/",  async (req, res) => {
   const newProduct = new Product(req.body);
 
   try {
@@ -19,7 +15,7 @@ router.post("/", verifytokenandadmin, async (req, res) => {
 });
 
 //Update the product
-router.put("/:id", verifytokenandadmin, async (req, res) => {
+router.put("/:id", async (req, res) => {
   try {
     const productupdate = await Product.findByIdAndUpdate(
       req.params.id,
@@ -35,7 +31,7 @@ router.put("/:id", verifytokenandadmin, async (req, res) => {
 });
 
 //DELETE
-router.delete("/:id", verifytokenandadmin, async (req, res) => {
+router.delete("/:id",  async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
     res.status(200).json("Your Product has been deleted");

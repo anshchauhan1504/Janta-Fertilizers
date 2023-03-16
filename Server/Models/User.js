@@ -4,13 +4,10 @@ const mongoose=require("mongoose")
 
 const userSchema=new mongoose.Schema(
     {
-        username:{type:String,required:true,unique:true}, //Required means compulsory and unique can not be same
+         //Required means compulsory and unique can not be same
         email:{type:String,required:true,unique:true},
         password:{type:String, required:true},
-        isAdmin:{
-            type:Boolean,
-            default:false,
-        },
+        userId:{type:String, required:true},
     },
     {timestamps:true} //It will going to create our createdAt time and updated at time
 );
