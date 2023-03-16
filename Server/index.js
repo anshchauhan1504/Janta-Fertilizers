@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-
+const cors = require('cors');
 const authRoute = require('./Routes/auth');
 const productRoute = require('./Routes/product');
 const cartRoute = require('./Routes/cart');
@@ -18,15 +18,21 @@ mongoose
     console.log(err);
   });
 
-function allowCrossDomain(req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
+//   function allowCrossDomain(req, res, next) {
+//     const origin = req.get('origin');
+//     res.header('Access-Control-Allow-Origin', origin);
+//     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+//     res.header('Access-Control-Allow-Headers', 'Content-Type');
+//     res.header('Access-Control-Allow-Credentials', 'true');
+  
+//     next();
+//   }
 
-  next();
-}
-
-app.use(allowCrossDomain);
+// app.use(allowCrossDomain);
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 app.use(express.json());
 app.use(cookieParser());
 

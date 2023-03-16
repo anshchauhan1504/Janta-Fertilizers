@@ -1,14 +1,15 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Search, ShoppingBasketOutlined } from "@material-ui/icons";
 import { Badge } from "@material-ui/core";
 import { useNavigate } from "react-router-dom";
 import { mobile } from "../Responsive";
 import { useSelector } from "react-redux";
+import axios from "axios";
 const Container = styled.div`
   //Styled components
   height: 60px;
-  background-color:lightgreen;
+  background-color: lightgreen;
   ${mobile({ height: "50px" })}
 `;
 const Wrapper = styled.div`
@@ -30,61 +31,110 @@ const Language = styled.span`
   ${mobile({ display: "none" })}
 `;
 const SearchContainer = styled.div`
-   border: 0.5px solid lightgray;
+  border: 0.5px solid lightgray;
   display: flex;
   align-items: center;
   margin-left: 25px;
   padding: 5px;
 `;
 const Input = styled.input`
-border:none;
-${mobile({ width: "50px" })}`
+  border: none;
+  ${mobile({ width: "50px" })}
+`;
 const Center = styled.div`
   flex: 1;
-  text-align:center;
+  text-align: center;
 `;
-const Logo=styled.h1`
-font-weight: bold;
-font-size: 27px;
-cursor:pointer;
-${mobile({ fontSize: "24px" })}
-`
+const Logo = styled.h1`
+  font-weight: bold;
+  font-size: 27px;
+  cursor: pointer;
+  ${mobile({ fontSize: "24px" })}
+`;
 const Right = styled.div`
   flex: 1;
   display: flex;
   align-items: center;
-  justify-content:flex-end;
+  justify-content: flex-end;
   ${mobile({ flex: 2, justifyContent: "center" })}
 `;
 
 const MenuItem = styled.div`
-font-size:15px;
-cursor:pointer;
-margin-left: 25px;
-${mobile({ fontSize: "12px", marginLeft: "10px" })}
-`
+  font-size: 15px;
+  cursor: pointer;
+  margin-left: 25px;
+  ${mobile({ fontSize: "12px", marginLeft: "10px" })}
+`;
 const Navbar = () => {
-  const cartProducts = useSelector(state=>state.cart.quantity); //The cartProducts variable returned by useSelector will contain the current value of the products array in the cart slice of the Redux store state. When the value of this array changes in the store state, useSelector will automatically trigger a re-render of the component to update the UI with the new data.
-  const navigate=useNavigate();
+  const [userEmail, setUserEmail] = useState("");
+  const cartProducts = useSelector((state) => state.cart.quantity);
+  const navigate = useNavigate();
+  function getcookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+  }
+  const userId = getcookie("userId");
+  console.log(userId) //This is printing undefined
+  useEffect(() => {
+    const fetchUserEmail = async () => {
+      try {
+        console.log("inside") //This is not hitting 
+        const res = await axios.get("http://localhost:5000/api/auth/user", {
+          withCredentials: true,
+        });
+        setUserEmail(res.data.email);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+  
+    if(userId){
+      fetchUserEmail();
+    }
+    else{
+      console.log("not working") //This is printing
+    }
+    
+    
+  }, []);
+
   return (
     <Container>
       <Wrapper>
         <Left>
           <Language>EN</Language>
           <SearchContainer>
-            <Input placeholder="Search"/>
-            <Search style={{ color: "gray", fontSize: 16 }}/>
+            <Input placeholder="Search" />
+            <Search style={{ color: "gray", fontSize: 16 }} />
           </SearchContainer>
         </Left>
-        <Center><Logo onClick={()=>navigate(`/`)}>Janta Fertilizers</Logo></Center>
+        <Center>
+          <Logo onClick={() => navigate(`/`)}>Janta Fertilizers</Logo>
+        </Center>
         <Right>
-            <MenuItem onClick={()=>navigate(`/Register/`)}>Register</MenuItem>
-            <MenuItem onClick={()=>navigate(`/Login/`)}>Sign In</MenuItem>
-            <MenuItem>
-            <Badge badgeContent={cartProducts} color="primary">
-              <ShoppingBasketOutlined onClick={()=>navigate(`/Cart`)}/>
-            </Badge>
-            </MenuItem>
+          {userEmail ? (
+            <>
+              <MenuItem>{userEmail}</MenuItem>
+              <MenuItem onClick={() => navigate(`/Cart`)}>
+                <Badge badgeContent={cartProducts} color="primary">
+                  <ShoppingBasketOutlined />
+                </Badge>
+              </MenuItem>
+            </>
+          ) : (
+            <>
+              <MenuItem onClick={() => navigate(`/Register/`)}>
+                Register
+              </MenuItem>
+              <MenuItem onClick={() => navigate(`/Login/`)}>Sign In</MenuItem>
+              <MenuItem onClick={() => navigate(`/Cart`)}>
+                <Badge badgeContent={cartProducts} color="primary">
+                  <ShoppingBasketOutlined />
+                </Badge>
+              </MenuItem>
+            </>
+          )}
         </Right>
       </Wrapper>
     </Container>
