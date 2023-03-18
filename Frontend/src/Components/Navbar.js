@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import { Search, ShoppingBasketOutlined } from "@material-ui/icons";
 import { Badge } from "@material-ui/core";
@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { mobile } from "../Responsive";
 import { useSelector } from "react-redux";
 import axios from "axios";
+import { AuthContext } from "../AuthContext";
+import '../Pages/Navbarstyle.css'
 const Container = styled.div`
   //Styled components
   height: 60px;
@@ -65,39 +67,45 @@ const MenuItem = styled.div`
   margin-left: 25px;
   ${mobile({ fontSize: "12px", marginLeft: "10px" })}
 `;
+// const cartProducts = useSelector((state) => state.cart.quantity);
 const Navbar = () => {
   const [userEmail, setUserEmail] = useState("");
   const cartProducts = useSelector((state) => state.cart.quantity);
   const navigate = useNavigate();
-  function getcookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-  }
-  const userId = getcookie("userId");
-  console.log(userId) //This is printing undefined
+
   useEffect(() => {
-    const fetchUserEmail = async () => {
+    const fetchData = async () => {
       try {
-        console.log("inside") //This is not hitting 
-        const res = await axios.get("http://localhost:5000/api/auth/user", {
-          withCredentials: true,
+        const res = await fetch("http://localhost:5000/api/auth/user", {
+          credentials: "include",
         });
-        setUserEmail(res.data.email);
+        const content = await res.json();
+        console.log(content.user.email);
+        setUserEmail(content.user.email); // Set user email if logged in
       } catch (error) {
-        console.log(error);
+        console.log(error)
+        // Handle error here
       }
     };
-  
-    if(userId){
-      fetchUserEmail();
-    }
-    else{
-      console.log("not working") //This is printing
-    }
-    
-    
+
+    fetchData();
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (res.ok) {
+        setUserEmail(""); // Update userEmail state
+      } else {
+        // Handle error here
+      }
+    } catch (error) {
+      // Handle error here
+    }
+  }
 
   return (
     <Container>
@@ -115,12 +123,8 @@ const Navbar = () => {
         <Right>
           {userEmail ? (
             <>
-              <MenuItem>{userEmail}</MenuItem>
-              <MenuItem onClick={() => navigate(`/Cart`)}>
-                <Badge badgeContent={cartProducts} color="primary">
-                  <ShoppingBasketOutlined />
-                </Badge>
-              </MenuItem>
+              <MenuItem className="useremail">{userEmail}</MenuItem>
+              <MenuItem onClick={handleLogout}>Log Out</MenuItem>
             </>
           ) : (
             <>
@@ -128,13 +132,13 @@ const Navbar = () => {
                 Register
               </MenuItem>
               <MenuItem onClick={() => navigate(`/Login/`)}>Sign In</MenuItem>
-              <MenuItem onClick={() => navigate(`/Cart`)}>
-                <Badge badgeContent={cartProducts} color="primary">
-                  <ShoppingBasketOutlined />
-                </Badge>
-              </MenuItem>
             </>
           )}
+          <MenuItem onClick={() => navigate(`/Cart`)}>
+            <Badge badgeContent={cartProducts} color="primary">
+              <ShoppingBasketOutlined />
+            </Badge>
+          </MenuItem>
         </Right>
       </Wrapper>
     </Container>
@@ -142,3 +146,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

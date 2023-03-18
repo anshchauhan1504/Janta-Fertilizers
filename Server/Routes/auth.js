@@ -29,65 +29,79 @@ router.post("/signup", async (req, res) => {
       if (err.code === 11000) {
         // Duplicate key error, handle it accordingly
         if (err.keyPattern.email) {
-          res.status(409).send("Email already exists");
+          res.status(500).json({message:"Email already exists"});
         } else if (err.keyPattern.userId) {
-          res.status(409).send("User ID already exists");
+          res.status(500).json({message:"User ID already exists"});
         } else {
-          res.status(500).send("Error ");
+          res.status(500).json({message:"Error "});
         }
       } else {
         // Other error, return a generic message
         console.error(err);
-        res.status(500).send("Error creating user");
+        res.status(500).json({message:"Error creating user"});
       }
     }
   });
 
 //LOG IN
 router.post("/signin", async (req, res) => {
-  const { email, password } = req.body; // assuming email and password are passed in the request body
+  const { email, password } = req.body;
 
   try {
     const user = await User.findOne({ email: email });
     if (!user) {
-      res.status(401).send("User not found");
+      res.status(500).json({message:"User not found"});
       return;
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      res.status(401).send("Incorrect password");
+      res.status(500).json({message:"Incorrect password"});
       return;
     }
 
     res.cookie("userId", user.userId);
-    console.log(user.userId)
-    res.status(200).send("User signed in successfully");
+    console.log(user.email)
+    res.status(200).json({ message: "User signed in successfully" });
+ // send JSON response
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error finding user");
+    res.status(500).json({message:"Error finding user"});
   }
 });
+
+
+
+//Handle logout
+router.post("/logout", async (req, res) => {
+  try {
+    res.clearCookie("userId");
+    res.status(200).json({message:"User logged out successfully"});
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({message:"Error logging out user"});
+  }
+});
+
+
 
 //GET THE USER WHO SUCCESSFULLY LOGGED IN 
 
 router.get("/user", async (req, res) => {
   const userId = req.cookies.userId;
-  console.log(userId) //This is correctly printing
-//After hitting request it is not going in try block 
+
   try {
-    console.log("inside")
     const user = await User.findOne({ userId: userId });
     if (!user) {
-      res.status(401).send("User not found");
+      res.status(500).json({ message: "User not found" });
       return;
     }
-    console.log(user)
-    res.status(200).send(user);
+
+    res.status(200).json({ user }); // Return an object with the email property
     return;
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error finding user");
+    res.status(500).json({ message: "Error finding user" });
   }
 });
 module.exports = router;

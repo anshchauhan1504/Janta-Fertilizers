@@ -70,7 +70,7 @@ const Error = styled.span`
   color: red;
 `;
 
-const Login = ({setLoginUser}) => {
+const Login = () => {
   const [email,setemail]=useState("");
   const [password,setpassword]=useState("");
   const [error,seterror]=useState("");
@@ -84,11 +84,14 @@ const Login = ({setLoginUser}) => {
     }
 
     try {
-      const res=await axios.post("http://localhost:5000/api/auth/signin",{
-        email,
-        password,
+      await fetch('http://localhost:5000/api/auth/signin',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        credentials:'include',
+        body: JSON.stringify({
+          email,password
+        })
       })
-      console.log(res.data);
       setemail("");
       setpassword("");
       navigate("/"); //Home page
@@ -101,21 +104,7 @@ const Login = ({setLoginUser}) => {
       }
       
     }
-  }
-  // const dispatch=useDispatch();
-  // const {isFetching,error}=useSelector((state)=>state.user);
-  // const handlelogin=async(e)=>{
-  //   e.preventDefault();
-  //   try {
-  //     await login(dispatch,{email,password});
-      
-  //   } catch (error) {
-  //     console.log(error)
-      
-  //   }
-    
-  // }
-  
+  }  
   return (
     <Container>
       <Wrapper>

@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
+// const bodyParser = require("body-parser");
 const dotenv = require('dotenv');
 const cors = require('cors');
 const authRoute = require('./Routes/auth');
@@ -35,7 +36,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
-
+// app.use(bodyParser.json());
 app.use('/api/auth', authRoute);
 app.use('/api/products', productRoute);
 app.use('/api/carts', cartRoute);

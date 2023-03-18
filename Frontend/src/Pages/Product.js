@@ -10,6 +10,7 @@ import { publicRequest } from "../requestmethods";
 import { useEffect, useState } from "react";
 import { addproduct, removeproduct } from "../Redux/cartredux";
 import { useDispatch } from "react-redux";
+import axios from "axios";
 const Container = styled.div``;
 const Wrapper = styled.div`
   padding: 50px;
@@ -139,16 +140,72 @@ const Product = () => {
   // The object being passed to the action creator is a copy of the product state, with an additional quantity property. The quantity property is set to the value of the quantity state, which represents the quantity of the product being added to the cart.
   // The action creator returns an action object that has a type property set to "ADD_PRODUCT" and a payload property set to the object representing the product being added to the cart.
   // The dispatch function is called with the action object returned by the action creator. This will trigger a state update that adds the product to the shopping cart.
-  const handleClick = () => {
-    dispatch(addproduct({ ...product, quantity }));
+
+  const handleClick = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/carts/addtocart", {
+        method:"POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          productId: product._id,
+          productImage: product.img,
+          price: product.price,
+          quantity,
+        }),
+      });
+      const data = await response.json(); // parse response data as JSON
+      console.log(data); // log the response data to the console
+      dispatch(addproduct({ ...product, quantity }));
+    } catch (error) {
+      console.log(error);
+    }
   };
-  const handleClick1 = () => {
-    console.log("Removing product:", product._id);
-    dispatch(removeproduct({ id: product._id }));
+  
+  
+  
+  
+
+
+
+  // const handleClick = async () => {
+  //   try {
+  //     await fetch("http://localhost:5000/api/carts/addtocart", {
+  //       method: "POST",
+  //       credentials: "include",
+  //       body: JSON.stringify({
+  //         productId: product._id,
+  //         productImage: product.img,
+  //         price: product.price,
+  //         quantity,
+  //       }),
+  //     });
+  //     dispatch(addproduct({ ...product, quantity }));
+  //   } catch (error) {}
+  // };
+  
+  const handleClick1 = async () => {
+    try {
+      await fetch("http://localhost:5000/api/carts/removefromcart", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          productId: product._id
+        }),
+      });
+      dispatch(removeproduct({ id: product._id }));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  console.log("Product:", product);
-  console.log("Dispatch function:", dispatch);
+  // console.log("Product:", product);
+  // console.log("Dispatch function:", dispatch);
 
   return (
     <Container>

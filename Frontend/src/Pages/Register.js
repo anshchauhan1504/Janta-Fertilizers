@@ -86,11 +86,18 @@ const Register = () => {
     }
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/signup", {
-        email,
-        password,
+      await fetch('http://localhost:5000/api/auth/signup',{
+        method :"POST",
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          email,password
+        })
+
       });
-      console.log(res.data);
+      // const res = await axios.post("http://localhost:5000/api/auth/signup", {
+      //   email,
+      //   password,
+      // });
       // Clear the input fields
       setName("");
       setLastName("");
