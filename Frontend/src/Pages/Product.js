@@ -151,6 +151,7 @@ const Product = () => {
         },
         body: JSON.stringify({
           productId: product._id,
+          productTitle:product.title,
           productImage: product.img,
           price: product.price,
           quantity,

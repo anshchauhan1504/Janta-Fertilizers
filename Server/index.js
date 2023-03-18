@@ -37,6 +37,10 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 // app.use(bodyParser.json());
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ message: "Internal server error" });
+});
 app.use('/api/auth', authRoute);
 app.use('/api/products', productRoute);
 app.use('/api/carts', cartRoute);

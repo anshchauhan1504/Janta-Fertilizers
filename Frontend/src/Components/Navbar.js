@@ -7,7 +7,7 @@ import { mobile } from "../Responsive";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { AuthContext } from "../AuthContext";
-import '../Pages/Navbarstyle.css'
+import "../Pages/Navbarstyle.css";
 const Container = styled.div`
   //Styled components
   height: 60px;
@@ -70,7 +70,7 @@ const MenuItem = styled.div`
 // const cartProducts = useSelector((state) => state.cart.quantity);
 const Navbar = () => {
   const [userEmail, setUserEmail] = useState("");
-  const cartProducts = useSelector((state) => state.cart.quantity);
+  const [totalItems,setTotalItems] =useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -80,16 +80,22 @@ const Navbar = () => {
           credentials: "include",
         });
         const content = await res.json();
-        console.log(content.user.email);
-        setUserEmail(content.user.email); // Set user email if logged in
+        setUserEmail(content.user.email);// Set user email if logged in
+        setTotalItems(content.user.cart.length); 
       } catch (error) {
-        console.log(error)
+        console.log(error);
         // Handle error here
       }
     };
 
     fetchData();
   }, []);
+
+//Get total length of user cart array
+
+
+
+
 
   const handleLogout = async () => {
     try {
@@ -99,13 +105,14 @@ const Navbar = () => {
       });
       if (res.ok) {
         setUserEmail(""); // Update userEmail state
+        navigate("/");
       } else {
         // Handle error here
       }
     } catch (error) {
       // Handle error here
     }
-  }
+  };
 
   return (
     <Container>
@@ -125,6 +132,11 @@ const Navbar = () => {
             <>
               <MenuItem className="useremail">{userEmail}</MenuItem>
               <MenuItem onClick={handleLogout}>Log Out</MenuItem>
+              <MenuItem onClick={() => navigate(`/Cart`)}>
+                <Badge badgeContent={totalItems} color="primary">
+                  <ShoppingBasketOutlined />
+                </Badge>
+              </MenuItem>
             </>
           ) : (
             <>
@@ -134,11 +146,6 @@ const Navbar = () => {
               <MenuItem onClick={() => navigate(`/Login/`)}>Sign In</MenuItem>
             </>
           )}
-          <MenuItem onClick={() => navigate(`/Cart`)}>
-            <Badge badgeContent={cartProducts} color="primary">
-              <ShoppingBasketOutlined />
-            </Badge>
-          </MenuItem>
         </Right>
       </Wrapper>
     </Container>
@@ -146,4 +153,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

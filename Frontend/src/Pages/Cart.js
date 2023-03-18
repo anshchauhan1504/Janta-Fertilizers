@@ -12,7 +12,7 @@ import StripeCheckout from "react-stripe-checkout";
 import { userRequest } from "../requestmethods";
 import { useDispatch } from "react-redux";
 import { setProducts, setTotal, setQuantity } from "../Redux/cartredux";
-import { addproduct,removeproduct,clearcart } from "../Redux/cartredux";
+import { addproduct, removeproduct, clearcart } from "../Redux/cartredux";
 const Container = styled.div``;
 
 const Wrapper = styled.div`
@@ -154,14 +154,78 @@ const Button = styled.button`
 const Cart = () => {
   // const { id } = useParams();
   const navigate = useNavigate();
-  const cart = useSelector((state) => state.cart);
+  const [cartItems, setCartItems] = useState([]);
+  const [totalamount,setTotalAmount]=useState(0);
   const key = process.env.REACT_APP_STRIPE;
+  const [totalItems,setTotalItems] =useState("");
   const [quantity, setQuantity] = useState(1);
   const [stripetoken, setStripetoken] = useState(null);
   const dispatch = useDispatch();
   const onToken = (token) => {
     setStripetoken(token);
   };
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/carts/cartItems",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "userId":document.cookie,
+              // set the cookie header with the user's cookie
+            },
+            credentials:'include',
+          }
+        );
+        const data = await response.json();
+        console.log(data);
+        setCartItems(data.cartItems);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchCartItems();
+  }, []);
+
+  //Get total amount of items stored in user cart array
+  useEffect(() => {
+    const fetchTotalAmount = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/carts/totalamount", {
+          headers: {
+            "Content-Type": "application/json",
+            "userId": document.cookie, // set the cookie header with the user's cookie
+          },
+          credentials: "include",
+        });
+        const data = await response.json();
+        console.log(data);
+        setTotalAmount(data.totalAmount);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchTotalAmount();
+  }, []);
+  
+  //Get total length of user cart array
+  useEffect(() => {
+    const fetchlength = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/auth/user", {
+          credentials: "include",
+        });
+        const content = await res.json();
+        setTotalItems(content.user.cart.length); 
+      } catch (error) {
+        console.log(error);
+        // Handle error here
+      }
+    };
+
+    fetchlength();
+  }, []);
 
   useEffect(() => {
     const makeRequest = async () => {
@@ -173,7 +237,7 @@ const Cart = () => {
         navigate("/Success", {
           state: {
             stripeData: res.data,
-            products: cart,
+            products: cartItems,
           },
         });
       } catch (err) {
@@ -182,8 +246,7 @@ const Cart = () => {
     };
 
     stripetoken && makeRequest();
-  }, [stripetoken, cart.total, navigate]);
-  
+  }, [stripetoken, totalamount, navigate]);
 
   //Explanation of useEffect
   //   we are performing an asynchronous operation using userRequest.post to submit a payment with Stripe. Once the payment has been successfully processed, we use history.push (or navigate) to navigate to the "/success" page and pass along two pieces of data as state: stripeData and products. stripeData contains the data returned by Stripe in response to the payment request, while products contains the cart items that were submitted for payment.
@@ -205,37 +268,35 @@ const Cart = () => {
         <Top>
           <TopButton onClick={() => navigate(`/`)}>CONTINUE SHOPPING</TopButton>
           <TopTexts>
-            <TopText>Shopping Bag(2)</TopText>
+            <TopText>Shopping Bag({totalItems})</TopText>
             <TopText>Your Wishlist (0)</TopText>
           </TopTexts>
           <TopButton type="filled">CHECKOUT NOW</TopButton>
         </Top>
         <Bottom>
           <Info>
-            {cart.products.map((product) => (
-              <Product>
+            {cartItems.map((item) => (
+              <Product key={item._id}>
                 <ProductDetail>
-                  <Image src={product.img} />
+                  <Image src={item.productImage} />
                   <Details>
                     <ProductName>
-                      <b>Product:</b> {product.title}
+                      <b>Product:</b> {item.productTitle}
                     </ProductName>
                     <ProductId>
-                      <b>ID:</b> {product._id}
+                      <b>ID:</b> {item.productId}
                     </ProductId>
                   </Details>
                 </ProductDetail>
                 <PriceDetail>
                   <ProductAmountContainer>
-                    <Add
-                    />
-                    <ProductAmount>{product.quantity}</ProductAmount>
+                    <Add  />
+                    <ProductAmount>{item.quantity}</ProductAmount>
                     <Remove
+                      
                     />
                   </ProductAmountContainer>
-                  <ProductPrice>
-                    ₹ {product.price * product.quantity}
-                  </ProductPrice>
+                  <ProductPrice>₹ {item.price}</ProductPrice>
                 </PriceDetail>
               </Product>
             ))}
@@ -245,7 +306,7 @@ const Cart = () => {
             <SummaryTitle>ORDER SUMMARY</SummaryTitle>
             <SummaryItem>
               <SummaryItemText>Subtotal</SummaryItemText>
-              <SummaryItemPrice>₹ {cart.total}</SummaryItemPrice>
+              <SummaryItemPrice>₹ {totalamount}</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem>
               <SummaryItemText>Estimated Shipping</SummaryItemText>
@@ -257,15 +318,15 @@ const Cart = () => {
             </SummaryItem>
             <SummaryItem type="total">
               <SummaryItemText>Total</SummaryItemText>
-              <SummaryItemPrice>₹{cart.total}</SummaryItemPrice>
+              <SummaryItemPrice>₹{totalamount-120}</SummaryItemPrice>
             </SummaryItem>
             <StripeCheckout
               name="Janta Fertilizers"
               image="http://www.dayalgroup.com/img/dg-logo.jpg"
               billingAddress
               shippingAddress
-              description={`Your total is ₹${cart.total}`}
-              amount={cart.total * 100}
+              description={`Your total is ₹${totalamount-120}`}
+              amount={(totalamount-120) * 100}
               token={onToken}
               stripeKey={key}
               currency="INR"
