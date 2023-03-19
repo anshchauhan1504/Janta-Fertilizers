@@ -26,16 +26,14 @@ router.post("/addtocart", async (req, res) => {
     const existingProduct = user.cart.find(
       (product) => product.productId === productdetails.productId
     );
-    console.log("existingProduct:", existingProduct);
+    
 
     if (existingProduct) {
       // If the product already exists, update the quantity
       const updatedQuantity =
         existingProduct.quantity + productdetails.quantity;
       const updatedPrice = productdetails.price * updatedQuantity;
-      console.log("updatedQuantity:", updatedQuantity);
-      console.log("updatedPrice:", updatedPrice);
-
+    
       const result = await User.updateOne(
         { userId: userId, "cart.productId": productdetails.productId },
         {
@@ -111,14 +109,14 @@ router.post("/removefromcart", async (req, res) => {
       if (result.modifiedCount > 0) {
         res.status(200).json("Success removed product from cart");
       } else {
-        res.status(500).send("Error removing product from cart");
+        res.status(400).send("Error removing product from cart");
       }
     } else {
       res.status(200).json("Product not present in cart");
     }
   } catch (error) {
     console.error(error);
-    res.status(500).send("Error removing product from cart");
+    res.status(400).send("Error removing product from cart");
   }
 });
 
@@ -144,52 +142,56 @@ router.get("/cartItems", async (req, res) => {
   }
 });
 
-//Get the total price of items stored in cart array of user
-router.get("/totalamount", async (req, res) => {
+//Update the quantity of existing cart product  by 1 and also their prices
+router.get("/updateby1", async (req, res) => {
   const cartuser = req.headers.cookie;
-
   if (!cartuser) {
     return res.status(400).json({ message: "Cookie header missing" });
   }
-
   const userId = cartuser.split("=")[1];
-
+  console.log(userId)
+  const productId = req.query.productId;
+  console.log(productId)
   try {
+    // Find the user and the product in the cart
     const user = await User.findOne({ userId: userId });
-    const cartItems = user.cart;
-    let totalAmount = 0;
+    const product = user.cart.find((p) => p.productId === productId);
+    console.log(product)
 
-    for (let i = 0; i < cartItems.length; i++) {
-      totalAmount += cartItems[i].price;
+    if (product) {
+      // Increase the quantity and update the price
+      const updatedQuantity = product.quantity + 1;
+      const updatedPrice = product.price * updatedQuantity;
+
+      // Update the quantity and price in the cart
+      const result = await User.updateOne(
+        { userId: userId, "cart.productId": productId },
+        {
+          $set: {
+            "cart.$.quantity": updatedQuantity,
+            "cart.$.price": updatedPrice,
+          },
+        }
+      );
+
+      if (result.modifiedCount > 0) {
+        // Get the updated cart from the database
+        const updatedCart = await User.findOne({ userId: userId });
+        console.log(updatedCart);
+        res.status(200).json({ cart: updatedCart.cart });
+      } else {
+        res
+          .status(400)
+          .send({ message: "Error updating product quantity in cart" });
+      }
+    } else {
+      res.status(400).json({ message: "Product not found in cart" });
     }
-
-    res.status(200).json({ totalAmount });
   } catch (error) {
     console.error(error);
-    res.status(400).json({ message: "Error retrieving total amount" });
+    res
+      .status(400)
+      .json({ message: "Error updating product quantity in cart" });
   }
 });
-
-//Get the total length of user cart array
-router.get("/totalitems", async (req, res) => {
-  const cartuser = req.headers.cookie;
-
-  if (!cartuser) {
-    return res.status(400).json({ message: "Cookie header missing" });
-  }
-
-  const userId = cartuser.split("=")[1];
-
-  try {
-    const user = await User.findOne({ userId: userId });
-    const cartItems = user.cart;
-    const totalItems = cartItems.length;
-
-    res.status(200).json({ totalItems });
-  } catch (error) {
-    console.error(error);
-    res.status(400).json({ message: "Error retrieving total items" });
-  }
-});
-
 module.exports = router;

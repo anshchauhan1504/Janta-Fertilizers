@@ -1,18 +1,15 @@
 import { Add, Remove } from "@material-ui/icons";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import Enquiry from "../Components/Enquiry";
 import Footer from "../Components/Footer";
 import Navbar from "../Components/Navbar";
-import { FungiItems, HerbiItems, InsectItems, popularProducts } from "../data";
 import { mobile } from "../Responsive";
 import StripeCheckout from "react-stripe-checkout";
 import { userRequest } from "../requestmethods";
 import { useDispatch } from "react-redux";
-import { setProducts, setTotal, setQuantity } from "../Redux/cartredux";
-import { addproduct, removeproduct, clearcart } from "../Redux/cartredux";
+import axios from "axios";
 const Container = styled.div``;
 
 const Wrapper = styled.div`
@@ -44,10 +41,12 @@ const TopButton = styled.button`
 
 const TopTexts = styled.div`
   ${mobile({ display: "none" })}
+  justify-content:center;
 `;
 const TopText = styled.span`
   text-decoration: underline;
   cursor: pointer;
+
   margin: 0px 10px;
 `;
 
@@ -155,10 +154,9 @@ const Cart = () => {
   // const { id } = useParams();
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
-  const [totalamount,setTotalAmount]=useState(0);
+  const [totalamount, setTotalAmount] = useState(0);
   const key = process.env.REACT_APP_STRIPE;
-  const [totalItems,setTotalItems] =useState("");
-  const [quantity, setQuantity] = useState(1);
+  const [totalItems, setTotalItems] = useState("");
   const [stripetoken, setStripetoken] = useState(null);
   const dispatch = useDispatch();
   const onToken = (token) => {
@@ -172,10 +170,10 @@ const Cart = () => {
           {
             headers: {
               "Content-Type": "application/json",
-              "userId":document.cookie,
+              userId: document.cookie,
               // set the cookie header with the user's cookie
             },
-            credentials:'include',
+            credentials: "include",
           }
         );
         const data = await response.json();
@@ -188,27 +186,6 @@ const Cart = () => {
     fetchCartItems();
   }, []);
 
-  //Get total amount of items stored in user cart array
-  useEffect(() => {
-    const fetchTotalAmount = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/carts/totalamount", {
-          headers: {
-            "Content-Type": "application/json",
-            "userId": document.cookie, // set the cookie header with the user's cookie
-          },
-          credentials: "include",
-        });
-        const data = await response.json();
-        console.log(data);
-        setTotalAmount(data.totalAmount);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchTotalAmount();
-  }, []);
-  
   //Get total length of user cart array
   useEffect(() => {
     const fetchlength = async () => {
@@ -217,7 +194,13 @@ const Cart = () => {
           credentials: "include",
         });
         const content = await res.json();
-        setTotalItems(content.user.cart.length); 
+        let totalAmount = 0;
+        for (let i = 0; i < content.user.cart.length; i++) {
+          //Get total amount of items stored in user cart array
+          totalAmount += content.user.cart[i].price;
+        }
+        setTotalAmount(totalAmount);
+        setTotalItems(content.user.cart.length);
       } catch (error) {
         console.log(error);
         // Handle error here
@@ -226,6 +209,32 @@ const Cart = () => {
 
     fetchlength();
   }, []);
+
+  const handleQuantityChange = (productId, newQuantity) => {
+    const updatedCartItems = cartItems.map((item) => {
+      if (item._id === productId) {
+        if (newQuantity < 1) {
+          // If the new quantity is less than 1, remove the product from the cart
+          return null;
+        } else {
+          // Otherwise, update the quantity and price of the product
+          return {
+            ...item,
+            quantity: newQuantity,
+            price: item.price * item.quantity,
+          };
+        }
+      } else {
+        return item;
+      }
+    });
+
+    // Remove any null items from the updated cart
+    const filteredCartItems = updatedCartItems.filter((item) => item !== null);
+
+    // Update the cart items in the state
+    setCartItems(filteredCartItems);
+  };
 
   useEffect(() => {
     const makeRequest = async () => {
@@ -269,9 +278,7 @@ const Cart = () => {
           <TopButton onClick={() => navigate(`/`)}>CONTINUE SHOPPING</TopButton>
           <TopTexts>
             <TopText>Shopping Bag({totalItems})</TopText>
-            <TopText>Your Wishlist (0)</TopText>
           </TopTexts>
-          <TopButton type="filled">CHECKOUT NOW</TopButton>
         </Top>
         <Bottom>
           <Info>
@@ -290,11 +297,13 @@ const Cart = () => {
                 </ProductDetail>
                 <PriceDetail>
                   <ProductAmountContainer>
-                    <Add  />
-                    <ProductAmount>{item.quantity}</ProductAmount>
-                    <Remove
+                    {/* <Add
                       
-                    />
+                    /> */}
+                    <ProductAmount>{item.quantity}</ProductAmount>
+                    {/* <Remove
+                      
+                    /> */}
                   </ProductAmountContainer>
                   <ProductPrice>₹ {item.price}</ProductPrice>
                 </PriceDetail>
@@ -318,21 +327,36 @@ const Cart = () => {
             </SummaryItem>
             <SummaryItem type="total">
               <SummaryItemText>Total</SummaryItemText>
-              <SummaryItemPrice>₹{totalamount-120}</SummaryItemPrice>
+              <SummaryItemPrice>
+                ₹
+                {totalamount > 0 && totalamount >= 120
+                  ? totalamount - 120
+                  : totalamount}
+              </SummaryItemPrice>
             </SummaryItem>
-            <StripeCheckout
-              name="Janta Fertilizers"
-              image="http://www.dayalgroup.com/img/dg-logo.jpg"
-              billingAddress
-              shippingAddress
-              description={`Your total is ₹${totalamount-120}`}
-              amount={(totalamount-120) * 100}
-              token={onToken}
-              stripeKey={key}
-              currency="INR"
-            >
-              <Button>CHECKOUT NOW</Button>
-            </StripeCheckout>
+            {totalamount > 0 && (
+              <StripeCheckout
+                name="Janta Fertilizers"
+                image="http://www.dayalgroup.com/img/dg-logo.jpg"
+                billingAddress
+                shippingAddress
+                description={`Your total is ₹${
+                  totalamount > 0 && totalamount >= 120
+                    ? totalamount - 120
+                    : totalamount
+                }`}
+                amount={
+                  (totalamount > 0 && totalamount >= 120
+                    ? totalamount - 120
+                    : totalamount) * 100
+                }
+                token={onToken}
+                stripeKey={key}
+                currency="INR"
+              >
+                <Button>CHECKOUT NOW</Button>
+              </StripeCheckout>
+            )}
           </Summary>
         </Bottom>
       </Wrapper>
