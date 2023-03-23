@@ -78,14 +78,14 @@ const ProductItem = ({ item }) => {
 
       <Info>
         <Icon>
-          <ShoppingBasketOutlined />
+          <ShoppingBasketOutlined onClick={()=>navigate(`/cart`)}/>
         </Icon>
         <Icon>
           <SearchOutlined onClick={()=>navigate(`/Product/${item._id}`)}/>
         </Icon>
-        <Icon>
+        {/* <Icon>
           <FavoriteBorderOutlined />
-        </Icon>
+        </Icon> */}
       </Info>
     </Container>
   );

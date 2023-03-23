@@ -106,7 +106,7 @@ const Register = () => {
       setPassword("");
       setConfirmPassword("");
       // Navigate to the Home page
-      navigate("/Login");
+      navigate("/login");
     } catch (error) {
       console.log(error);
       if (error.response && error.response.data.message) {

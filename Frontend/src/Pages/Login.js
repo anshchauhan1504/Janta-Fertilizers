@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { login } from "../Redux/apiCalls";
-import {mobile} from "../Responsive";
+import { mobile } from "../Responsive";
 import axios from "axios";
 const Container = styled.div`
   width: 100vw;
@@ -56,7 +56,6 @@ const Button = styled.button`
     color: green;
     cursor: not-allowed;
   }
-
 `;
 
 const Link = styled.a`
@@ -71,58 +70,73 @@ const Error = styled.span`
 `;
 
 const Login = () => {
-  const [email,setemail]=useState("");
-  const [password,setpassword]=useState("");
-  const [error,seterror]=useState("");
-  const navigate=useNavigate();
+  const [email, setemail] = useState("");
+  const [password, setpassword] = useState("");
+  const [error, seterror] = useState("");
+  const navigate = useNavigate();
 
-  const handlelogin=async(e)=>{
+  const handlelogin = async (e) => {
     e.preventDefault();
-    if(!email || !password){
+    if (!email || !password) {
       seterror("Please fill all the required fields.");
       return;
     }
 
     try {
-      await fetch('http://localhost:5000/api/auth/signin',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        credentials:'include',
+      const response = await fetch("http://localhost:5000/api/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
-          email,password
-        })
-      })
+          email,
+          password,
+        }),
+      });
       setemail("");
       setpassword("");
-      navigate("/"); //Home page
+      if (response.ok) {
+        navigate("/"); //Home page
+        console.log("hello")
+      } else if (response.status === 400) {
+        seterror("Incorrect email or password.");
+      } else {
+        throw new Error("Server responded with status " + response.status);
+      }
     } catch (error) {
       console.log(error);
-      if (error.response && error.response.data.message) {
-        seterror(error.response.data.message);
-      } else {
-        seterror("Something went wrong. Please try again later.");
-      }
-      
+      seterror("Something went wrong. Please try again later.");
     }
-  }  
+  };
+
   return (
     <Container>
       <Wrapper>
         <Title>SIGN IN</Title>
         <Form>
-          <Input placeholder="Email" value={email} type="email" onChange={(e)=>setemail(e.target.value)}/>
-          <Input placeholder="Password" value={password} type="password" onChange={(e)=>setpassword(e.target.value)} />
-          <Button onClick={handlelogin} >LOGIN</Button>
+          <Input
+            placeholder="Email"
+            value={email}
+            type="email"
+            onChange={(e) => setemail(e.target.value)}
+          />
+          <Input
+            placeholder="Password"
+            value={password}
+            type="password"
+            onChange={(e) => setpassword(e.target.value)}
+          />
+          <Button onClick={handlelogin}>LOGIN</Button>
           {error && <Error>{error}</Error>}
           {/* disabled={isFetching} */}
           {/* {error && <Error>Something went wrong...</Error>} */}
           <Link>DO NOT YOU REMEMBER THE PASSWORD?</Link>
-          <Link onClick={()=>navigate(`/Register/`)}>CREATE A NEW ACCOUNT</Link>
+          <Link onClick={() => navigate(`/register/`)}>
+            CREATE A NEW ACCOUNT
+          </Link>
         </Form>
       </Wrapper>
     </Container>
   );
 };
-
 
 export default Login;

@@ -6,8 +6,10 @@ import { useNavigate } from "react-router-dom";
 import { mobile } from "../Responsive";
 import { useSelector } from "react-redux";
 import axios from "axios";
+import Alert from "react-bootstrap/Alert";
 import { AuthContext } from "../AuthContext";
 import "../Pages/Navbarstyle.css";
+import { Modal } from "bootstrap";
 const Container = styled.div`
   //Styled components
   height: 60px;
@@ -67,41 +69,33 @@ const MenuItem = styled.div`
   margin-left: 25px;
   ${mobile({ fontSize: "12px", marginLeft: "10px" })}
 `;
-const Error = styled.div`
-  background-color: #ffebee;
-  color: #b71c1c;
-  border: 1px solid #e53935;
-  padding: 12px;
-  border-radius: 4px;
-  font-weight: bold;
-  text-align: center;
-  animation: fadeIn 0.5s ease-out, fadeOut 0.5s ease-in 1s forwards;
 
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fadeOut {
-    from { opacity: 1; transform: translateY(0); }
-    to { opacity: 0; transform: translateY(-10px); }
-  }
-`;
 // const cartProducts = useSelector((state) => state.cart.quantity);
 const Navbar = () => {
   const [userEmail, setUserEmail] = useState("");
   const [totalItems, setTotalItems] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await fetch("http://localhost:5000/api/auth/user", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
           credentials: "include",
         });
         const content = await res.json();
-        setUserEmail(content.user.email); // Set user email if logged in
-        setTotalItems(content.user.cart.length);
+        console.log(content);
+        if (content.user && content.user.email) {
+          setUserEmail(content.user.email); // Set user email if logged in
+          setTotalItems(content.user.cart.length);
+        } else {
+          console.log("not found");
+          // Handle missing or invalid data here
+        }
       } catch (error) {
         console.log(error);
         // Handle error here
@@ -112,8 +106,14 @@ const Navbar = () => {
   }, []);
 
   //Get total length of user cart array
-
-
+  function handleCartClick() {
+    if (!userEmail) {
+      setShowAlert(true);
+      setTimeout(() => setShowAlert(false), 1000);
+    } else {
+      navigate("/login"); // or any other action you want to perform when the user is not logged in
+    }
+  }
 
   const handleLogout = async () => {
     try {
@@ -134,6 +134,9 @@ const Navbar = () => {
 
   return (
     <Container>
+      {showAlert && (
+        <Alert variant="danger">Please log in to access your cart.</Alert>
+      )}
       <Wrapper>
         <Left>
           <Language>EN</Language>
@@ -150,7 +153,7 @@ const Navbar = () => {
             <>
               <MenuItem className="useremail">{userEmail}</MenuItem>
               <MenuItem onClick={handleLogout}>Log Out</MenuItem>
-              <MenuItem onClick={() => navigate('/Cart')}>
+              <MenuItem onClick={() => navigate("/Cart")}>
                 <Badge badgeContent={totalItems} color="primary">
                   <ShoppingBasketOutlined />
                 </Badge>
@@ -158,13 +161,13 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <MenuItem onClick={() => navigate(`/Register/`)}>
+              <MenuItem onClick={() => navigate(`/register/`)}>
                 Register
               </MenuItem>
-              <MenuItem onClick={() => navigate('/Login')}>Sign In</MenuItem>
-              <MenuItem >
+              <MenuItem onClick={() => navigate("/login")}>Sign In</MenuItem>
+              <MenuItem>
                 <Badge color="primary">
-                  <ShoppingBasketOutlined />
+                  <ShoppingBasketOutlined onClick={handleCartClick} />
                 </Badge>
               </MenuItem>
             </>
