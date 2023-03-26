@@ -80,7 +80,7 @@ const Navbar = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/auth/user", {
+        const res = await fetch("https://janta-fertilizer-server.onrender.com/api/auth/user", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -117,7 +117,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/auth/logout", {
+      const res = await fetch("https://janta-fertilizer-server.onrender.com/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });

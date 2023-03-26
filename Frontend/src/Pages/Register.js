@@ -86,7 +86,7 @@ const Register = () => {
     }
 
     try {
-      await fetch('http://localhost:5000/api/auth/signup',{
+      await fetch('https://janta-fertilizer-server.onrender.com/api/auth/signup',{
         method :"POST",
         headers:{'Content-Type':'application/json'},
         body: JSON.stringify({

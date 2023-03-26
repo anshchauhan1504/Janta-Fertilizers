@@ -166,7 +166,7 @@ const Cart = () => {
     const fetchCartItems = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/carts/cartItems",
+          "https://janta-fertilizer-server.onrender.com/api/carts/cartItems",
           {
             headers: {
               "Content-Type": "application/json",
@@ -190,7 +190,7 @@ const Cart = () => {
   useEffect(() => {
     const fetchlength = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/auth/user", {
+        const res = await fetch("https://janta-fertilizer-server.onrender.com/api/auth/user", {
           credentials: "include",
         });
         const content = await res.json();
@@ -239,7 +239,7 @@ const Cart = () => {
   useEffect(() => {
     const makeRequest = async () => {
       try {
-        const res = await userRequest.post("/checkout/payment", {
+        const res = await userRequest.post("https://janta-fertilizer-server.onrender.com/api/checkout/payment", {
           tokenId: stripetoken.id,
           amount: 500,
         });
