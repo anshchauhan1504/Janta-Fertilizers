@@ -31,11 +31,17 @@ mongoose
 
 // app.use(allowCrossDomain);
 app.use(cors({
+  credentials: true,
   origin: true,
-  credentials: true
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
 app.use(express.json());
-app.use(cookieParser());
+app.use(cookieParser(process.env.PASS_SEC, {
+  sameSite: 'none',
+  secure: true
+}));
+// app.use(cookieParser());
 // app.use(bodyParser.json());
 app.use((err, req, res, next) => {
   console.error(err);

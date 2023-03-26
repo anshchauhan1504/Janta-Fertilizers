@@ -10,7 +10,7 @@ import { publicRequest } from "../requestmethods";
 import { useEffect, useState } from "react";
 import { addproduct, removeproduct } from "../Redux/cartredux";
 import { useDispatch } from "react-redux";
-import axios from "axios";
+import Cookies from 'universal-cookie';
 const Container = styled.div``;
 const Wrapper = styled.div`
   padding: 50px;
@@ -118,10 +118,11 @@ const Product = () => {
   const [product, setProduct] = useState({});
   const [quantity, setQuantity] = useState(1);
   const dispatch = useDispatch();
+  
   useEffect(() => {
     const getProduct = async () => {
       try {
-        const res = await publicRequest.get("https://janta-fertilizer-server.onrender.com/api/products/find/" + id);
+        const res = await publicRequest.get("http://localhost:5000/api/products/find/" + id);
         setProduct(res.data);
       } catch {}
     };
@@ -140,10 +141,11 @@ const Product = () => {
   // The object being passed to the action creator is a copy of the product state, with an additional quantity property. The quantity property is set to the value of the quantity state, which represents the quantity of the product being added to the cart.
   // The action creator returns an action object that has a type property set to "ADD_PRODUCT" and a payload property set to the object representing the product being added to the cart.
   // The dispatch function is called with the action object returned by the action creator. This will trigger a state update that adds the product to the shopping cart.
-
+const cookies = new Cookies();
   const handleClick = async () => {
+    
     try {
-      const response = await fetch("https://janta-fertilizer-server.onrender.com/api/carts/addtocart", {
+      const response = await fetch("http://localhost:5000/api/carts/addtocart", {
         method:"POST",
         credentials: "include",
         headers: {
@@ -155,6 +157,7 @@ const Product = () => {
           productImage: product.img,
           price: product.price,
           quantity,
+          userId:cookies.get('userId')
         }),
       });
       const data = await response.json(); // parse response data as JSON
@@ -189,14 +192,15 @@ const Product = () => {
   
   const handleClick1 = async () => {
     try {
-      await fetch("https://janta-fertilizer-server.onrender.com/api/carts/removefromcart", {
+      await fetch("http://localhost:5000/api/carts/removefromcart", {
         method: "POST",
         credentials: "include",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          productId: product._id
+          productId: product._id,
+          userId:cookies.get('userId')
         }),
       });
       dispatch(removeproduct({ id: product._id }));

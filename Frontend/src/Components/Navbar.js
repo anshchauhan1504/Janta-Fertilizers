@@ -9,7 +9,7 @@ import axios from "axios";
 import Alert from "react-bootstrap/Alert";
 import { AuthContext } from "../AuthContext";
 import "../Pages/Navbarstyle.css";
-import { Modal } from "bootstrap";
+import Cookies from 'universal-cookie';
 const Container = styled.div`
   //Styled components
   height: 60px;
@@ -76,16 +76,22 @@ const Navbar = () => {
   const [totalItems, setTotalItems] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
+  const cookies = new Cookies();
 
   useEffect(() => {
+
     const fetchData = async () => {
       try {
-        const res = await fetch("https://janta-fertilizer-server.onrender.com/api/auth/user", {
-          method: "GET",
+        const res = await fetch("http://localhost:5000/api/auth/user", {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            userId: cookies.get('userId')
+        }),
           credentials: "include",
+
         });
         const content = await res.json();
         console.log(content);
@@ -117,7 +123,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch("https://janta-fertilizer-server.onrender.com/api/auth/logout", {
+      const res = await fetch("http://localhost:5000/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });

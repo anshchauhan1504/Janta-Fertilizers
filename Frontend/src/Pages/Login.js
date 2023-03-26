@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { login } from "../Redux/apiCalls";
 import { mobile } from "../Responsive";
-import axios from "axios";
+import Cookies from 'universal-cookie';
 const Container = styled.div`
   width: 100vw;
   height: 100vh;
@@ -83,7 +83,7 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch("https://janta-fertilizer-server.onrender.com/api/auth/signin", {
+      const response = await fetch("http://localhost:5000/api/auth/signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -92,11 +92,16 @@ const Login = () => {
           password,
         }),
       });
+      const cookies = new Cookies();
       setemail("");
       setpassword("");
+      const data=await response.json();
+      // console.log(data);
       if (response.ok) {
+        cookies.set('userId', data.userId ,{ path: '/' }); //
+        console.log('Signin successful!');
         navigate("/"); //Home page
-        console.log("hello")
+        console.log(response)
       } else if (response.status === 400) {
         seterror("Incorrect email or password.");
       } else {

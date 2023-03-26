@@ -1,8 +1,9 @@
 import styled from "styled-components";
 import { mobile } from "../Responsive";
-import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Cookies from 'universal-cookie';
+
 const Container = styled.div`
   width: 100vw;
   height: 100vh;
@@ -69,7 +70,7 @@ const Register = () => {
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -86,35 +87,43 @@ const Register = () => {
     }
 
     try {
-      await fetch('https://janta-fertilizer-server.onrender.com/api/auth/signup',{
+      const response = await fetch('http://localhost:5000/api/auth/signup', {
         method :"POST",
-        headers:{'Content-Type':'application/json'},
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
-          email,password
-        })
-
+          name,
+          lastName,
+          username,
+          email,
+          password,
+        }),
       });
-      // const res = await axios.post("http://localhost:5000/api/auth/signup", {
-      //   email,
-      //   password,
-      // });
-      // Clear the input fields
-      setName("");
-      setLastName("");
-      setUsername("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-      // Navigate to the Home page
-      navigate("/login");
+      const cookies = new Cookies();
+ 
+      const data = await response.json();
+      if (response.ok) {
+        cookies.set('userId', data.userId ,{ path: '/' }); //
+        console.log('Signup successful!');
+        console.log(data);
+        setName('');
+        setLastName('');
+        setUsername('');
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+        navigate('/login');
+      } else {
+        throw new Error('Signup failed.');
+      }
     } catch (error) {
       console.log(error);
       if (error.response && error.response.data.message) {
         setError(error.response.data.message);
       } else {
-        setError("Something went wrong. Please try again later.");
+        setError('Something went wrong. Please try again later.');
       }
     }
+    
   };
 
   return (

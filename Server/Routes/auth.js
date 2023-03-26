@@ -23,8 +23,8 @@ router.post("/signup", async (req, res) => {
   
       await newUser.save();
   
-      res.cookie("userId", userId);
-      res.status(200).json({message:"User created successfully"});
+      // res.cookie("userId", userId);
+      res.status(200).json({message:"User created successfully",userId:userId});//Sending to frontend
     } catch (err) {
       if (err.code === 11000) {
         // Duplicate key error, handle it accordingly
@@ -59,10 +59,11 @@ router.post("/signin", async (req, res) => {
       res.status(400).json({message:"Incorrect password"});
       return;
     }
-
-    res.cookie("userId", user.userId);
-    console.log(user.email)
-    res.status(200).json({ message: "User signed in successfully" });
+    // res.cookie("userId", user.userId, { secure: true, sameSite: "none" });
+    // res.cookie("userId", user.userId);
+    console.log(user.userId);
+    console.log(user.email);
+    res.status(200).json({ message: "User signed in successfully",userId:user.userId });
  // send JSON response
   } catch (err) {
     console.error(err);
@@ -87,17 +88,16 @@ router.post("/logout", async (req, res) => {
 
 //GET THE USER WHO SUCCESSFULLY LOGGED IN 
 
-router.get("/user", async (req, res) => {
-  const userId = req.cookies.userId;
-
+router.post("/user", async (req, res) => {
+  const userId = req.cookies.userId;  
   try {
     const user = await User.findOne({ userId: userId });
     if (!user) {
       res.status(400).json({ message: "User not found" });
       return;
     }
-
-    res.status(200).json({ user }); // Return an object with the email property
+    
+    res.status(200).json({ message:"done alright",user}); // Return an object with the email property
     return;
   } catch (err) {
     console.error(err);

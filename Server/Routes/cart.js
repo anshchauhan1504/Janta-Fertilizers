@@ -16,8 +16,7 @@ const router = require("express").Router();
 //Remove cart ->find the user and remove one item and send
 
 router.post("/addtocart", async (req, res) => {
-  const cartuser = req.headers.cookie;
-  const userId = cartuser.split("=")[1];
+  const userId = req.body.userId;
   const productdetails = req.body;
 
   try {
@@ -90,8 +89,7 @@ router.post("/addtocart", async (req, res) => {
 //REMOVE PRODUCT FROM CART
 
 router.post("/removefromcart", async (req, res) => {
-  const cartuser = req.headers.cookie;
-  const userId = cartuser.split("=")[1];
+  const userId= req.body.userId;
   const productId = req.body.productId;
 
   try {
@@ -121,14 +119,13 @@ router.post("/removefromcart", async (req, res) => {
 });
 
 //GET USER CART
-router.get("/cartItems", async (req, res) => {
-  const cartuser = req.headers.cookie;
-
-  if (!cartuser) {
+router.post("/cartItems", async (req, res) => {
+  const userId = req.body.userId;
+ console.log(req.body);
+  if (!userId) {
     return res.status(400).json({ message: "Cookie header missing" });
   }
 
-  const userId = cartuser.split("=")[1];
 
   try {
     const user = await User.findOne({ userId: userId });

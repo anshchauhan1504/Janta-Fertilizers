@@ -9,7 +9,7 @@ import { mobile } from "../Responsive";
 import StripeCheckout from "react-stripe-checkout";
 import { userRequest } from "../requestmethods";
 import { useDispatch } from "react-redux";
-import axios from "axios";
+import Cookies from "universal-cookie";
 const Container = styled.div``;
 
 const Wrapper = styled.div`
@@ -162,17 +162,19 @@ const Cart = () => {
   const onToken = (token) => {
     setStripetoken(token);
   };
+  const cookies = new Cookies();
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
         const response = await fetch(
-          "https://janta-fertilizer-server.onrender.com/api/carts/cartItems",
+          "http://localhost:5000/api/carts/cartItems",
           {
+            method: "POST",
             headers: {
               "Content-Type": "application/json",
-              userId: document.cookie,
               // set the cookie header with the user's cookie
             },
+            body: JSON.stringify({ userId: cookies.get("userId") }),
             credentials: "include",
           }
         );
@@ -190,14 +192,19 @@ const Cart = () => {
   useEffect(() => {
     const fetchlength = async () => {
       try {
-        const res = await fetch("https://janta-fertilizer-server.onrender.com/api/auth/user", {
+        const res = await fetch("http://localhost:5000/api/auth/user", {
+          method: "POST",
+          body: JSON.stringify({
+            userId: cookies.get("userId"),
+          }),
           credentials: "include",
         });
         const content = await res.json();
+        console.log(content);
         let totalAmount = 0;
         for (let i = 0; i < content.user.cart.length; i++) {
           //Get total amount of items stored in user cart array
-          totalAmount += content.user.cart[i].price;
+          totalAmount += content.user.cart[i].price*content.user.cart[i].quantity;
         }
         setTotalAmount(totalAmount);
         setTotalItems(content.user.cart.length);
@@ -239,10 +246,13 @@ const Cart = () => {
   useEffect(() => {
     const makeRequest = async () => {
       try {
-        const res = await userRequest.post("https://janta-fertilizer-server.onrender.com/api/checkout/payment", {
-          tokenId: stripetoken.id,
-          amount: 500,
-        });
+        const res = await userRequest.post(
+          "http://localhost:5000/api/checkout/payment",
+          {
+            tokenId: stripetoken.id,
+            amount: 500,
+          }
+        );
         navigate("/success", {
           state: {
             stripeData: res.data,
