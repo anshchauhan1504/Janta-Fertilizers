@@ -102,6 +102,10 @@ router.post("/logout", async (req, res) => {
 //GET THE USER WHO SUCCESSFULLY LOGGED IN 
 
 router.post("/user", async (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   const userId = req.body.userId; 
   try {
     const user = await User.findOne({ userId: userId });

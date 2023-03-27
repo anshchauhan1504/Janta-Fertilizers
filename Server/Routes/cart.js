@@ -120,6 +120,10 @@ router.post("/removefromcart", async (req, res) => {
 
 //GET USER CART
 router.post("/cartItems", async (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   const userId = req.body.userId;
  console.log(req.body);
   if (!userId) {
@@ -193,6 +197,10 @@ router.get("/updateby1", async (req, res) => {
 });
 
 router.get("/totalcartamount/:userId", async (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   const userId = req.params.userId;
 
   try {
