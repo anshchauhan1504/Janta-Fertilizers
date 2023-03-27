@@ -82,6 +82,7 @@ const Navbar = () => {
 
     const fetchData = async () => {
       try {
+        console.log(cookies.get('userId'));
         const res = await fetch("https://janta-fertilizer-server.onrender.com/api/auth/user", {
           method: "POST",
           headers: {

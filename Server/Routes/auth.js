@@ -89,8 +89,8 @@ router.post("/logout", async (req, res) => {
 //GET THE USER WHO SUCCESSFULLY LOGGED IN 
 
 router.post("/user", async (req, res) => {
-  const userId = req.cookies.userId; 
-  console.log(userId) 
+  const userId = req.body.userId; 
+  console.log("userid123 : "+userId) 
   try {
     const user = await User.findOne({ userId: userId });
     console.log(user)
