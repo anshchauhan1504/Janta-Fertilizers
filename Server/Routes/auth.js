@@ -90,7 +90,6 @@ router.post("/logout", async (req, res) => {
 
 router.post("/user", async (req, res) => {
   const userId = req.body.userId; 
-  console.log("userid123 : "+userId) 
   try {
     const user = await User.findOne({ userId: userId });
     console.log(user)

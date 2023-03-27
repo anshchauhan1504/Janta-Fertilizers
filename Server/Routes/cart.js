@@ -191,4 +191,24 @@ router.get("/updateby1", async (req, res) => {
       .json({ message: "Error updating product quantity in cart" });
   }
 });
+
+router.get("/totalcartamount/:userId", async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const user = await User.findOne({ userId: userId });
+    const cartItems = user.cart;
+    let totalAmount = 0;
+
+    for (let i = 0; i < cartItems.length; i++) {
+      totalAmount += cartItems[i].price*cartItems[i].quantity;
+    }
+
+    res.status(200).json({ totalAmount });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ message: "Error calculating total cart amount" });
+  }
+});
+
 module.exports = router;

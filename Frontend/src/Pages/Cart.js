@@ -154,7 +154,7 @@ const Cart = () => {
   // const { id } = useParams();
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
-  const [totalamount, setTotalAmount] = useState(0);
+  const [totalCartAmount,setTotalCartAmount]=useState(0);
   const key = process.env.REACT_APP_STRIPE;
   const [totalItems, setTotalItems] = useState("");
   const [stripetoken, setStripetoken] = useState(null);
@@ -188,6 +188,32 @@ const Cart = () => {
     fetchCartItems();
   }, []);
 
+  useEffect(() => {
+    const fetchTotalCartAmount = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/carts/totalcartamount/${cookies.get(
+            "userId"
+          )}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              // set the cookie header with the user's cookie
+            },
+            credentials: "include",
+          }
+        );
+        const data = await response.json();
+        console.log(data);
+        setTotalCartAmount(data.totalAmount);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchTotalCartAmount();
+  }, []);
+
   //Get total length of user cart array
   useEffect(() => {
     const fetchlength = async () => {
@@ -198,15 +224,9 @@ const Cart = () => {
             userId: cookies.get("userId"),
           }),
           credentials: "include",
+          
         });
         const content = await res.json();
-        console.log(content);
-        let totalAmount = 0;
-        for (let i = 0; i < content.user.cart.length; i++) {
-          //Get total amount of items stored in user cart array
-          totalAmount += content.user.cart[i].price*content.user.cart[i].quantity;
-        }
-        setTotalAmount(totalAmount);
         setTotalItems(content.user.cart.length);
       } catch (error) {
         console.log(error);
@@ -265,7 +285,7 @@ const Cart = () => {
     };
 
     stripetoken && makeRequest();
-  }, [stripetoken, totalamount, navigate]);
+  }, [stripetoken, totalCartAmount, navigate]);
 
   //Explanation of useEffect
   //   we are performing an asynchronous operation using userRequest.post to submit a payment with Stripe. Once the payment has been successfully processed, we use history.push (or navigate) to navigate to the "/success" page and pass along two pieces of data as state: stripeData and products. stripeData contains the data returned by Stripe in response to the payment request, while products contains the cart items that were submitted for payment.
@@ -325,7 +345,7 @@ const Cart = () => {
             <SummaryTitle>ORDER SUMMARY</SummaryTitle>
             <SummaryItem>
               <SummaryItemText>Subtotal</SummaryItemText>
-              <SummaryItemPrice>₹ {totalamount}</SummaryItemPrice>
+              <SummaryItemPrice>₹ {totalCartAmount}</SummaryItemPrice>
             </SummaryItem>
             <SummaryItem>
               <SummaryItemText>Estimated Shipping</SummaryItemText>
@@ -339,26 +359,26 @@ const Cart = () => {
               <SummaryItemText>Total</SummaryItemText>
               <SummaryItemPrice>
                 ₹
-                {totalamount > 0 && totalamount >= 120
-                  ? totalamount - 120
-                  : totalamount}
+                {totalCartAmount > 0 && totalCartAmount >= 120
+                  ? totalCartAmount - 120
+                  : totalCartAmount}
               </SummaryItemPrice>
             </SummaryItem>
-            {totalamount > 0 && (
+            {totalCartAmount > 0 && (
               <StripeCheckout
                 name="Janta Fertilizers"
                 image="http://www.dayalgroup.com/img/dg-logo.jpg"
                 billingAddress
                 shippingAddress
                 description={`Your total is ₹${
-                  totalamount > 0 && totalamount >= 120
-                    ? totalamount - 120
-                    : totalamount
+                  totalCartAmount > 0 && totalCartAmount >= 120
+                    ? totalCartAmount - 120
+                    : totalCartAmount
                 }`}
                 amount={
-                  (totalamount > 0 && totalamount >= 120
-                    ? totalamount - 120
-                    : totalamount) * 100
+                  (totalCartAmount > 0 && totalCartAmount >= 120
+                    ? totalCartAmount - 120
+                    : totalCartAmount) * 100
                 }
                 token={onToken}
                 stripeKey={key}
