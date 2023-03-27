@@ -138,7 +138,7 @@ const Navbar = () => {
       
       // Call the logout API to update the user's access token
       const response = await fetch(
-        "http://localhost:5000/api/auth/logout",
+        "https://janta-fertilizer-server.onrender.com/api/auth/logout",
         {
           method: "POST",
           headers: {
@@ -153,6 +153,7 @@ const Navbar = () => {
       // If the logout was successful, update the userEmail state to null
       if (data.message === "Successfully logged out") {
         setUserEmail(null);
+        navigate('/');
       }
       // handle success or error response from the API here
     } catch (error) {
