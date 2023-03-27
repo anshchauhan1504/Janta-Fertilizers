@@ -192,7 +192,7 @@ const Cart = () => {
     const fetchTotalCartAmount = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/carts/totalcartamount/${cookies.get(
+          `https://janta-fertilizer-server.onrender.com/api/carts/totalcartamount/${cookies.get(
             "userId"
           )}`,
           {

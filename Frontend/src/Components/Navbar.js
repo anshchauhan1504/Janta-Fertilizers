@@ -123,22 +123,47 @@ const Navbar = () => {
     }
   }
 
+
+
   const handleLogout = async () => {
     try {
-      const res = await fetch("https://janta-fertilizer-server.onrender.com/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-      if (res.ok) {
-        setUserEmail(""); // Update userEmail state
-        navigate("/");
-      } else {
-        // Handle error here
+      const userId = cookies.get("userId");
+      if (!userId) {
+        console.log("User is not logged in");
+        return;
       }
+      
+      // Clear the userId cookie
+      cookies.remove("userId");
+      
+      // Call the logout API to update the user's access token
+      const response = await fetch(
+        "http://localhost:5000/api/auth/logout",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId }),
+          credentials: "include",
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+      // If the logout was successful, update the userEmail state to null
+      if (data.message === "Successfully logged out") {
+        setUserEmail(null);
+      }
+      // handle success or error response from the API here
     } catch (error) {
-      // Handle error here
+      console.log(error);
+      // handle error here
     }
   };
+  
+  
+  
+  
 
   return (
     <Container>

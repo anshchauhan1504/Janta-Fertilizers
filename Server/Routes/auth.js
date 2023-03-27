@@ -75,14 +75,27 @@ router.post("/signin", async (req, res) => {
 
 //Handle logout
 router.post("/logout", async (req, res) => {
+  const userId = req.body.userId; // Assuming the userId is passed in the request body
+
   try {
-    res.clearCookie("userId");
-    res.status(200).json({message:"User logged out successfully"});
-  } catch (err) {
-    console.error(err);
-    res.status(400).json({message:"Error logging out user"});
+    // Find the user and update the accessToken to null
+    const result = await User.updateOne(
+      { userId: userId },
+      { $set: { accessToken: null } }
+    );
+    console.log("result:", result);
+
+    if (result.modifiedCount > 0) {
+      res.status(200).json({ message: "Successfully logged out" });
+    } else {
+      res.status(400).json({ message: "Error logging out" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ message: "Error logging out" });
   }
 });
+
 
 
 
