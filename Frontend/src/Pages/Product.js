@@ -122,7 +122,7 @@ const Product = () => {
   useEffect(() => {
     const getProduct = async () => {
       try {
-        const res = await publicRequest.get("http://localhost:5000/api/products/find/" + id);
+        const res = await publicRequest.get("https://janta-fertilizer-server.onrender.com/api/products/find/" + id);
         setProduct(res.data);
       } catch {}
     };
@@ -145,7 +145,7 @@ const cookies = new Cookies();
   const handleClick = async () => {
     
     try {
-      const response = await fetch("http://localhost:5000/api/carts/addtocart", {
+      const response = await fetch("https://janta-fertilizer-server.onrender.com/api/carts/addtocart", {
         method:"POST",
         credentials: "include",
         headers: {
@@ -192,7 +192,7 @@ const cookies = new Cookies();
   
   const handleClick1 = async () => {
     try {
-      await fetch("http://localhost:5000/api/carts/removefromcart", {
+      await fetch("https://janta-fertilizer-server.onrender.com/api/carts/removefromcart", {
         method: "POST",
         credentials: "include",
         headers: {

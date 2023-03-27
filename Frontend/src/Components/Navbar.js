@@ -82,7 +82,7 @@ const Navbar = () => {
 
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/auth/user", {
+        const res = await fetch("https://janta-fertilizer-server.onrender.com/api/auth/user", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -93,8 +93,9 @@ const Navbar = () => {
           credentials: "include",
 
         });
+        console.log(res)
         const content = await res.json();
-        console.log(content);
+        console.log(content.user);
         if (content.user && content.user.email) {
           setUserEmail(content.user.email); // Set user email if logged in
           setTotalItems(content.user.cart.length);
@@ -123,7 +124,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/auth/logout", {
+      const res = await fetch("https://janta-fertilizer-server.onrender.com/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });

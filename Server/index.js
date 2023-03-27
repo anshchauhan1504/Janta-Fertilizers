@@ -19,23 +19,23 @@ mongoose
     console.log(err);
   });
 
-//   function allowCrossDomain(req, res, next) {
-//     const origin = req.get('origin');
-//     res.header('Access-Control-Allow-Origin', origin);
-//     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-//     res.header('Access-Control-Allow-Headers', 'Content-Type');
-//     res.header('Access-Control-Allow-Credentials', 'true');
+  function allowCrossDomain(req, res, next) {
+    const origin = req.get('origin');
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    res.header('Access-Control-Allow-Credentials', 'true');
   
-//     next();
-//   }
+    next();
+  }
 
-// app.use(allowCrossDomain);
-app.use(cors({
-  credentials: true,
-  origin: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
+app.use(allowCrossDomain);
+// app.use(cors({
+//   credentials: true,
+//   origin: true,
+//   methods: ["GET", "POST", "PUT", "DELETE"],
+//   allowedHeaders: ["Content-Type", "Authorization"],
+// }));
 app.use(express.json());
 app.use(cookieParser(process.env.PASS_SEC, {
   sameSite: 'none',
