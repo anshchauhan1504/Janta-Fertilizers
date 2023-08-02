@@ -23,17 +23,17 @@ const Wrapper = styled.div`
   justify-content: space-between;
   ${mobile({ padding: "10px 0px" })}
 `;
-const Left = styled.div`
-  flex: 1;
-  display: flex;
-  align-items: center;
-`; //This 'left' name can not be changed
+// const Left = styled.div`
+//   flex: 1;
+//   display: flex;
+//   align-items: center;
+// `; //This 'left' name can not be changed
 
-const Language = styled.span`
-  font-size: 14px;
-  cursor: pointer;
-  ${mobile({ display: "none" })}
-`;
+// const Language = styled.span`
+//   font-size: 14px;
+//   cursor: pointer;
+//   ${mobile({ display: "none" })}
+// `;
 const SearchContainer = styled.div`
   border: 0.5px solid lightgray;
   display: flex;
@@ -41,13 +41,14 @@ const SearchContainer = styled.div`
   margin-left: 25px;
   padding: 5px;
 `;
-const Input = styled.input`
-  border: none;
-  ${mobile({ width: "50px" })}
-`;
+// const Input = styled.input`
+//   border: none;
+//   ${mobile({ width: "50px" })}
+// `;
 const Center = styled.div`
-  flex: 1;
+  /* flex: 1; */
   text-align: center;
+  justify-content:center;
 `;
 const Logo = styled.h1`
   font-weight: bold;
@@ -172,13 +173,13 @@ const Navbar = () => {
         <Alert variant="danger">Please log in to access your cart.</Alert>
       )}
       <Wrapper>
-        <Left>
+        {/* <Left>
           <Language>EN</Language>
           <SearchContainer>
             <Input placeholder="Search" />
             <Search style={{ color: "gray", fontSize: 16 }} />
           </SearchContainer>
-        </Left>
+        </Left> */}
         <Center>
           <Logo onClick={() => navigate(`/`)}>Janta Fertilizers</Logo>
         </Center>

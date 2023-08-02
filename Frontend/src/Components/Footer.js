@@ -65,6 +65,14 @@ const List = styled.ul`
 const ListItem = styled.li`
   width: 50%;
   margin-bottom: 10px;
+  cursor: pointer;
+  text-decoration: none;
+  color: black;
+  transition: color 0.2s;
+
+  &:hover {
+    color: blue;
+  }
 `;
 
 const ContactItem = styled.div`
@@ -76,41 +84,50 @@ const ContactItem = styled.div`
 const Payment = styled.img`
     width: 50%;
 `;
+const SocialIconLink = styled.a`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: white;
+  background-color: #${(props) => props.color};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20px;
+`;
 const Footer = () => {
+  const handleLinkClick = (url) => {
+    // Redirect the user to the specified URL when a list item is clicked
+    window.location.href = url;
+  };
   return (
     <Container>
         <Left>
         <Logo>Janta Fertilizer</Logo>
         <Desc>
-          There are many variations of passages of Lorem Ipsum available, but
-          the majority have suffered alteration in some form, by injected
-          humour, or randomised words which don’t look even slightly believable.
+        Discover the excellence of Janta Fertilizers – your go-to source for top-quality fertilizers. Our customer-centric approach fosters lasting relationships, ensuring a positive experience with goods and services of unparalleled quality.
         </Desc>
         <SocialContainer>
-          <SocialIcon color="3B5999">
-            <Facebook/>
-          </SocialIcon>
-          <SocialIcon color="E4405F">
-            <Instagram/>
-          </SocialIcon>
-          <SocialIcon color="55ACEE">
-            <Twitter/>
-          </SocialIcon>
+          <SocialIconLink href="https://www.facebook.com/profile.php?id=100075641943091" target="_blank" rel="noopener noreferrer" color="3B5999">
+            <Facebook />
+          </SocialIconLink>
+          <SocialIconLink href="https://www.instagram.com/anshchauhan13_22/" target="_blank" rel="noopener noreferrer" color="E4405F">
+            <Instagram />
+          </SocialIconLink>
+          <SocialIconLink href="https://twitter.com/ANSHCHA49852121" target="_blank" rel="noopener noreferrer" color="55ACEE">
+            <Twitter />
+          </SocialIconLink>
         </SocialContainer>
       </Left>
       <Center>
         <Title><b>Useful Links</b></Title>
         <List>
-          <ListItem>Home</ListItem>
-          <ListItem>Cart</ListItem>
-          <ListItem>Fungicide</ListItem>
-          <ListItem>Growth Control</ListItem>
-          <ListItem>Herbicide</ListItem>
-          <ListItem>Insecticide</ListItem>
-          <ListItem>My Account</ListItem>
-          <ListItem>Order Tracking</ListItem>
-          <ListItem>Wishlist</ListItem>
-          <ListItem>Terms</ListItem>
+        <List>
+          <ListItem onClick={() => handleLinkClick("https://janta-fertilizer.netlify.app/products/Fungicide")}>Fungicide</ListItem>
+          <ListItem onClick={() => handleLinkClick("https://janta-fertilizer.netlify.app/products/Growth")}>Growth Control</ListItem>
+          <ListItem onClick={() => handleLinkClick("https://janta-fertilizer.netlify.app/products/Herbicide")}>Herbicide</ListItem>
+          <ListItem onClick={() => handleLinkClick("https://janta-fertilizer.netlify.app/products/Insecticide")}>Insecticide</ListItem>
+        </List>
         </List>
       </Center>
       <Right>
@@ -122,7 +139,7 @@ const Footer = () => {
           <Phone style={{marginRight:"10px"}}/> +91 9719437625
         </ContactItem>
         <ContactItem>
-          <MailOutline style={{marginRight:"10px"}} /> shobhit.tele@gmail.com
+          <MailOutline style={{marginRight:"10px"}} /> ansh.chauhan15apr@gmail.com
         </ContactItem>
         <Payment src="https://i.ibb.co/Qfvn4z6/payment.png" />
       </Right>

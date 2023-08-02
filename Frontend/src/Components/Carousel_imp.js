@@ -3,6 +3,7 @@ import Carousel from 'react-bootstrap/Carousel';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import "./Carousel.css"
+import { colors } from '@material-ui/core';
 
 function CarouselFadeExample() {
   return (
@@ -15,8 +16,8 @@ function CarouselFadeExample() {
           style={{ maxHeight: '700px' }}
         />
         <Carousel.Caption>
-          <h3>First slide label</h3>
-          <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
+          <h3>Welcome to Our Fertilizer Shop</h3>
+          <p>Explore a wide range of premium fertilizers for your plants.</p>
         </Carousel.Caption>
       </Carousel.Item>
       <Carousel.Item>
@@ -28,8 +29,8 @@ function CarouselFadeExample() {
         />
 
         <Carousel.Caption>
-          <h3>Second slide label</h3>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+          <h3>High-Quality Fertilizers</h3>
+          <p>Find top-notch fertilizers to nourish your plants to perfection.</p>
         </Carousel.Caption>
       </Carousel.Item>
       <Carousel.Item>
@@ -41,9 +42,9 @@ function CarouselFadeExample() {
         />
 
         <Carousel.Caption>
-          <h3>Third slide label</h3>
+          <h3>Expert Advice</h3>
           <p>
-            Praesent commodo cursus magna, vel scelerisque nisl consectetur.
+          Get expert advice and guidance from our experienced team.
           </p>
         </Carousel.Caption>
       </Carousel.Item>
@@ -56,8 +57,8 @@ function CarouselFadeExample() {
         />
 
         <Carousel.Caption>
-          <h3>4rth slide label</h3>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+          <h3>Wide Selection</h3>
+          <p>Choose from a wide selection of fertilizers tailored to your needs.</p>
         </Carousel.Caption>
       </Carousel.Item>
     </Carousel>
